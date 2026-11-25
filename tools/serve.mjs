@@ -40,7 +40,7 @@ export function startServer(port = 8888) {
     // Netlify Forms: a POST to any path is captured and the visitor lands on the form's action page.
     if (req.method === 'POST') { req.resume(); return send(200, readFileSync(join(pub, 'thanks/index.html')), TYPES['.html']); }
     for (const r of config.redirects) {
-      if (url.pathname === r.from) return send(Number(r.status) || 301, '', 'text/plain', { Location: r.to });
+      if (toRegex(r.from).test(url.pathname.replace(/(.)\/$/, '$1'))) return send(Number(r.status) || 301, '', 'text/plain', { Location: r.to });
     }
     // Pretty URLs: /doctrine -> /doctrine/
     if (!extname(url.pathname) && !url.pathname.endsWith('/') && existsSync(join(pub, url.pathname, 'index.html'))) {

@@ -1,86 +1,106 @@
 # Handover: the Ace's Side website
 
-Built from the Brand Book and the Doctrine (both v1.0 draft, 24 Nov 2026). Twelve pages, no JavaScript, no cookies, no third-party requests, about 78 KB for a first visit to the home page.
+Version 2, 25 November 2026. Seven pages, no JavaScript, no cookies, no third-party requests. A first visit to the home page is about 75 KB.
 
-| Page | Address | Notes |
-| --- | --- | --- |
-| Home | `/` | Hero with the animated Emblem, what we are, Presence, divisions, the Call, the Lines |
-| The Doctrine | `/doctrine/` | Full text, print-ready. The only page set in Spectral |
-| The six divisions | `/divisions/` | |
-| The Call | `/call/` | Six steps, plus the **Raise a signal** form |
-| Membership | `/membership/` | Five stages with rank marks, the Oath, the **candidacy** form |
-| Accountability | `/accountability/` | Ten Articles, Lines, governance, what can never change |
-| Contact | `/contact/` | **Contact** form |
-| Legal notice and terms, Privacy, Accessibility | `/legal/` `/privacy/` `/accessibility/` | |
-| Thank you, Not found | `/thanks/` `/404.html` | |
+## What changed in this version, and why
 
-Short links: `/oath`, `/join`, `/signal`, `/privacy-policy`, `/terms`, `/security.txt`.
+The founders asked for four things:
 
-## Communication
+1. **Do not publish the Doctrine.**
+2. **Share much less.** Keep most things internal and confidential.
+3. **Make the black-and-white version of the brand the main one.**
+4. **Optimise the site better for mobile.**
 
-**Voice.** Every rule in the Brand Book's Voice section is applied: short sentences; no boasting; no enemies; each big idea followed by one concrete action (a button, a form, a page). The home page's four numbers (6 divisions, 10 Articles, 8 Lines, 1 Oath) are counts of things in the Doctrine, not claims about past work. The site claims no missions, no members and no results, because there is nothing yet to point to.
+## Public and internal
 
-**Where the words come from.** `src/content.mjs` holds the Doctrine's own text once; the home page, Doctrine page, divisions page and accountability page all draw from it, so they cannot disagree. The one-line and 60-word descriptions, the tagline and the Oath are verbatim.
+The site is a front door, not a map. It publishes only the wording the Brand Book itself wrote for public use (its "Voice and messaging" section), a contact form, and the legal pages.
 
-**Where I changed the source text** (each is one line in `src/content.mjs` or a page file):
+| On the public site | Kept internal (not on the site) |
+| --- | --- |
+| The tagline, the two supporting taglines | The Doctrine, in whole or in part |
+| The one-line description | The Oath, the Ten Articles, the Lines |
+| A contact form | Divisions: names, areas and work |
+| Legal notice, privacy notice, accessibility statement | The Call, membership stages, ranks, the Council, governance, the restart protocol |
+| | The Brand Book's rules and Legal protection analysis |
 
-| Source says | Site says | Why |
-| --- | --- | --- |
-| "moving toward a shared **destiny**" (Legacy) | "shared **future**" | Brand Book lists "destiny" under words to avoid |
-| Ward: "secure digital and **SCADA** systems, **defense against** harmful autonomous systems" | "secure digital and control systems, and **safeguards against** harmful autonomous systems" | Brand Book legal flag on implying security powers |
-| Assess: "Within **[response time]**" | "Within **a set response time**" | The founders have not decided it |
-| Preface: "Everything here beyond the founding text is a proposal for the founders to confirm" | removed; replaced by a visible **draft notice** on the Doctrine page | It was a note to the founders |
-| "Open decisions for the founders", the restart log table, the Brand Book's open typeface question | not published | Internal |
+The word "Presence" appears only because it is in the approved one-line description.
 
-**Left out on purpose.** The INITIATIVE descriptor (the Brand Book allows it but does not require it, and its Legal protection section flags that word; it is one line to add back in the hero). Division insignia (the Brand Book says they are still "to be drawn"). Photography (none exists, and the Brand Book requires signed releases). The Brand Book's private inspiration is not mentioned anywhere.
+`src/content.mjs` is the only file of alliance wording the build reads. It holds three taglines and says, in a comment, not to add Doctrine content without the founders' approval.
 
-**New copy I wrote** (everything not in the Doctrine): page leads and headings, form labels, the emergency notice, "Raise a concern", the legal pages. Read these as drafts.
+**Enforced by the verifier.** `tools/verify.mjs` fails if any page, `robots.txt`, `sitemap.xml`, the manifest or `security.txt` contains Doctrine vocabulary (doctrine, council, the division names, oath, member, candidate and so on), or if any of the removed pages is published.
 
-**The site shows its own status.** The footer says "Founding stage. The Doctrine is version 1.0 (draft)", and the Doctrine page carries a notice that the founders have not yet approved it. The Doctrine's own rule "No hidden mistakes" argues for starting honest. When the founders approve: set `doctrine.status` to `"approved"` in `site.config.json`.
+### The removed pages
 
-## Brand and design
+The Doctrine, Divisions, The Call, Membership and Accountability pages are gone from the site. Their old addresses redirect to the home page (`netlify.toml`), so old links and any search engine that saw an earlier deploy land somewhere sensible. The signal and candidacy forms are gone; there is one form, Contact.
 
-Every checkable Brand Book rule is enforced by `tools/verify.mjs`, which fails the build if one is broken:
+**They are not deleted from history.** The pages and their text are in git commit `e8577fd`. To bring one back:
 
-- **Name:** always "Ace’s Side" with a curly apostrophe; never "Aces Side", "Ace Side", "AcesSide". Capitals in the wordmark, lower case `acesside` for the web.
-- **Palette:** Charcoal, Stone, Bone, Void, Beacon only. No gradients, glows or shadows. Contrast measured: body text 8.67:1; Beacon on Charcoal 4.98:1; Stone on Charcoal 3.96:1, so Stone is used only for display text of 24 px and larger, as the Brand Book says.
-- **Beacon star:** at most one per page (home hero and the signal form).
-- **Typefaces:** at most two per page. Michroma for the name and short headlines; Spectral for the Doctrine; Inter for everything else.
-- **Emblem:** medium weight at 64 px and above; bold weight below that (header and footer). Never stretched, recoloured or decorated. Clear space and minimum size observed.
-- **Motion:** the hero Emblem animates once, slowly: star first, then the spire rises, then the ring closes. Nothing bounces. It is off when the visitor asks for reduced motion.
-- **Banned words** (army, empire, destiny, assemble…) cannot appear in the output.
+```bash
+git show e8577fd:src/pages/doctrine.mjs      # print it
+git checkout e8577fd -- src/pages/doctrine.mjs   # restore it
+```
 
-**Two findings about the Brand Book itself:**
+Anyone with access to this repository can read that history. It is private, so this is only a risk if access is shared too widely. Cleaning the history is possible, but it rewrites the repository for everyone who has a copy, so it needs a deliberate decision from the founders. See `docs/DEPLOY.md`, "If an earlier version was ever deployed", for the other places the old pages could still exist.
 
-1. **The Emblem cannot be restored by copying Appendix A out of the PDF.** The PDF wraps the code in a box and the line breaks swallow nine spaces (for example `648.54395.87` instead of `648.54 395.87`). Pasted as-is, it draws a broken shape. I repaired it and checked it against the Brand Book's own size check (x 244–780, y 181–837) and for left-right symmetry; the verified master is `brand/aces-side-emblem.svg`. Please fix Appendix A (for example, break the lines only at spaces, and print it in a smaller monospaced size) and store `brand/` in the three places Appendix B asks for. `node tools/make-brand-assets.mjs` regenerates every variant, the tile, the favicons and the social card from that one file.
-2. **The open typeface question has an answer.** Both PDFs embed **Michroma** (display) and **Spectral** (reading). Michroma is open-licensed and free for commercial use, so the site uses it. If the founders want a different display face, change one `@font-face` line.
+Other things removed with the pages: the Spectral typeface (it was used only for the Doctrine), the rank marks, and the "Founding stage / Doctrine v1.0 draft" notices in the footer and home page.
 
-**Not made, and not asked for:** LinkedIn profile picture, banners, business cards, letterhead and member cards (the Brand Book's other touchpoints). The generator in `tools/` makes the 800 × 800 profile picture in a few lines if you want it.
+## Black and white as the main version
+
+The Brand Book approves three versions of the Emblem. The main look is now the black-and-white one, **Night: Bone on Void**:
+
+- Header, hero, closing band and footer are Void (`#050505`) with the Bone Emblem and Bone text.
+- A Bone band gives rhythm and carries the contact form and the legal text, in Void ink.
+- **Beacon amber stays the single signal:** the rule under the headline, the call-to-action button and the star in it. Stone is used only for secondary text on Void (8.3:1).
+- Favicon, app icons and the share card (the LinkedIn preview) are all the Night version. Masters for it are in `brand/` (`aces-side-night-tile.svg`, `aces-side-night-app-tile.svg`, `mark-cream.svg`). The original Stone-on-Charcoal masters are still there for other uses.
+
+**One extension to flag.** The Brand Book's approved pairings are Stone on Charcoal, Bone on Void and Charcoal on Bone. On the Bone bands I use **Void ink** rather than Charcoal, because Charcoal reads as grey and the brief is black and white. It uses only palette colors, so no new color is introduced, but it is not one of the three listed pairings. If the founders prefer Charcoal ink, it is one value in `src/css/main.css`.
+
+## Mobile
+
+Rebuilt mobile-first, and checked at 320, 360, 375, 390, 412 and 430 px with touch emulation:
+
+- **One-row header.** The Emblem, the name and one Contact button, instead of a navigation block that wrapped onto three lines.
+- **The promise and its button arrive together.** The hero fills the visible screen (using `svh`, so the browser's address bar does not push the button off), and the button is checked to sit above the fold on 375 × 667, 360 × 640 and 390 × 844 screens.
+- **Thumb-sized.** Buttons are full width and at least 52 px tall; every tappable item is checked to be at least 44 px.
+- **No iOS zoom on focus.** Every form field is 17 px, and the check fails below 16 px.
+- **Right keyboard.** The email field brings up the email keyboard and does not autocorrect; names get capitals.
+- **Notches and rounded corners.** `viewport-fit=cover` with safe-area padding on the header, the page edges and the footer.
+- **Pinch zoom stays allowed.** The browser theme color is Void.
+- **Smaller.** Without the removed pages and the Spectral font, the home page is lighter.
+
+## Where I changed your wording
+
+| What | Note |
+| --- | --- |
+| Everything not in the Brand Book's public messaging | Removed |
+| New copy on the site | Page leads, the form labels, the Contact page, the legal pages. Read these as drafts. |
+
+## Brand findings from the first version (still true)
+
+1. **The Emblem cannot be restored by copying Appendix A out of the PDF.** The PDF's line wrapping swallows nine spaces, and the pasted code draws a broken shape. I repaired it and checked it against the Brand Book's size and symmetry test. The verified master is `brand/aces-side-emblem.svg`. The Brand Book's Appendix A should be corrected. `node tools/make-brand-assets.mjs` regenerates every variant, the tiles, the favicons and the share card from that file.
+2. **The display typeface is Michroma**, named in the PDFs' embedded fonts, and free for commercial use. That answers the Brand Book's open typeface question.
 
 ## Engineering
 
-- **Stack:** plain HTML and CSS generated by one dependency-free Node script (`build.mjs`). No framework, no bundler, no runtime JavaScript. This follows the Brand Book's "built to outlive its files": one person with Node can rebuild everything.
-- **Layout of the repo:** `src/content.mjs` (the words) · `src/pages/*.mjs` (one file per page) · `src/layout.mjs` (header, footer, forms, Emblem) · `src/css/main.css` · `brand/` (Emblem masters) · `tools/` (preview server, verifier, brand-asset generator) · `public/` (the built site, committed so it can be dragged into Netlify) · `docs/`.
+- **Stack:** plain HTML and CSS generated by one dependency-free Node script (`build.mjs`). No framework, no runtime JavaScript.
+- **Files:** `src/content.mjs` (the three taglines) · `src/pages/*.mjs` (one file per page) · `src/layout.mjs` (header, footer, form builder, the Emblem) · `src/css/main.css` · `brand/` · `tools/` · `public/` (the built site, committed so it can be dragged into Netlify).
 - **Commands:** `node build.mjs` builds. `npm start` previews at http://localhost:8888 with the production headers. `npm run verify` builds and runs the quality gate (needs `npm install` and `npx playwright install chromium` once).
-- **What `verify` checks** (about 960 checks): the real Content-Security-Policy is enforced with zero violations; no request leaves the site; no console errors; no horizontal scroll at 320 px; axe-core against WCAG 2.2 A and AA plus best practice, on every page at desktop and phone width; every link and anchor resolves; forms have the right Netlify attributes and require consent; keyboard skip link works; reduced motion is respected; the Brand Book rules above.
-- **Security:** strict CSP (`default-src 'self'`, no inline script or style), `frame-ancestors 'none'`, HSTS, `nosniff`, referrer and permissions policies. Hashed asset file names with one-year caching.
-- **Performance:** home page 6.5 KB HTML + 5.2 KB CSS (gzip) + 66 KB fonts, five requests. Fonts are self-hosted and preloaded.
-- **Browsers:** current Chrome, Edge, Safari and Firefox. The hero headline uses container-query units (2023+) with a plain `vw` fallback for older browsers.
-- **Tested in Chromium only.** Not run in Safari or Firefox, and not on real phones. Worth a manual pass before launch.
+- **What `verify` checks (about 630 checks):** the real Content-Security-Policy is enforced with no violations; no request leaves the site; no console errors; axe-core against WCAG 2.2 A and AA on every page at desktop and phone width; six phone widths for overflow, tap-target size and input text size; the first screen on three phone sizes; every link and anchor; the form's Netlify attributes and required consent; the skip link; reduced motion; the Brand Book's name, banned-word, typeface and Beacon-star rules; and the confidentiality scan above.
+- **Security:** strict CSP (`default-src 'self'`), `frame-ancestors 'none'`, HSTS, `nosniff`, referrer and permissions policies. Hashed asset names with one-year caching. The headers also ship in `public/_headers` so a drag-and-drop deploy is just as protected.
+- **Tested in Chromium only.** Not run in Safari or Firefox, and not on real phones. Worth a manual pass, especially an iPhone, before launch.
 
 ## Technology and operations
 
-Hosting, DNS, forms, email, soft-launch switch and rollback are in **`docs/DEPLOY.md`**. Three things need people, not code: **create the three mailboxes**, **set form notification emails in Netlify**, and **point DNS**.
+Hosting, DNS, the form, email, the soft-launch switch and rollback are in **`docs/DEPLOY.md`**. Three things need people, not code: **create the three mailboxes**, **set the form's notification email in Netlify**, and **point DNS**.
 
 ## Legal
 
-The full list is in **`docs/LEGAL.md`**. The headline: the Brand Book's own Protect checklist (trademark clearance, entity registration, domain ownership, designer assignments, division-name clearance) is still open, and the privacy notice contains proposed retention periods and transfer wording that a lawyer must confirm. The site makes no claim to be registered, official, or tax-exempt.
+See **`docs/LEGAL.md`**. The Brand Book's own Protect checklist is still open (trademark clearance, entity registration, domain ownership, designer assignments), and the privacy notice contains a proposed retention period and transfer wording a lawyer must confirm. The site makes no claim to be registered, official or tax-exempt.
 
 ## Decisions I need from the founders
 
 1. Go live now, or deploy with `SITE_INDEXING=off` until the Protect checklist is done?
-2. Are applications and signals open now? (The forms are live; someone must read them.)
-3. Who receives each form's notifications, and who owns `hello@`, `privacy@` and `security@`?
-4. Retention periods and the lawful bases in the Privacy Notice (`docs/LEGAL.md` §2).
-5. Approve, change or revert the four wording changes in the table above.
-6. Keep the INITIATIVE descriptor off the site, or add it back?
+2. Who receives the contact form's notifications, and who owns `hello@`, `privacy@` and `security@`?
+3. Is the home page the right amount of information, or even less? (For example, the one-line description could be the only text.)
+4. Void ink on Bone bands (current) or Charcoal ink?
+5. Should the git history that contains the removed pages be cleaned?

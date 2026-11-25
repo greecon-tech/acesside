@@ -38,16 +38,28 @@ The site already sends `Strict-Transport-Security` for one year. Do **not** add 
 
 **Confirm who owns acesside.com.** The Brand Book lists this under Protect. Check the registrar account, the renewal date and the contact email, and turn on auto-renew and registrar lock.
 
-## 4. Forms (Signal, Candidacy, Contact)
+## 4. The contact form
 
-Netlify finds the three forms (`signal`, `candidacy`, `contact`) at deploy time.
+The site has one form, `contact`. Netlify finds it at deploy time.
 
-1. **Forms** tab: confirm all three appear after the first deploy. If not, **Site configuration → Forms → Enable form detection**, then redeploy.
-2. **Forms → Form notifications → Add notification**: send an email for each form to the people who will handle it. Do this before launch, or submissions sit unseen in the dashboard.
-3. Submit each form once yourself and confirm the email arrives.
+1. **Forms** tab: confirm `contact` appears after the first deploy. If not, **Site configuration → Forms → Enable form detection**, then redeploy.
+2. **Forms → Form notifications → Add notification**: send an email to the people who will read it. Do this before launch, or submissions sit unseen in the dashboard.
+3. Submit the form once yourself and confirm the email arrives.
 4. Spam: the honeypot field and Netlify's built-in filtering (Akismet) are on. **Do not turn on reCAPTCHA**: it loads Google scripts, sets cookies, is blocked by the site's Content-Security-Policy, and would make the Privacy Notice untrue.
-5. Netlify keeps submissions until you delete them. The Privacy Notice promises deletion after 24 months (signals) and 12 months (applications, messages). Put a recurring reminder in a calendar.
+5. Netlify keeps submissions until you delete them. The Privacy Notice promises deletion 12 months after the last reply. Put a recurring reminder in a calendar.
 6. Check your plan's form limits on Netlify's pricing page (I found conflicting figures online). A paused site stops receiving submissions.
+
+## If an earlier version was ever deployed
+
+Version 1 of the site (commit `e8577fd`) contained the Doctrine and other internal pages. If you deployed it anywhere, redeploying this version removes those pages from the live address, and the old addresses now redirect to the home page. Three places can still hold the old pages:
+
+- **Old Netlify deploys.** Every deploy keeps its own permanent address (`<id>--<site>.netlify.app`) that still serves that version. In Netlify → **Deploys**, open the old deploys and delete them. Then check that only the current deploy remains.
+- **Search engines and caches.** If the site was indexed, use Google Search Console's **Removals** tool ("Remove outdated content") for the old addresses; Bing has an equivalent. The redirects help once crawlers revisit.
+- **Anything that copied it.** Browsers, link previews and archive sites may hold copies. Nothing can be done about those except asking.
+
+## Keeping search engines out in the meantime
+
+Set `SITE_INDEXING=off` (section 2) before the first deploy, and no search engine will list the site.
 
 ## 5. Email addresses
 
@@ -55,9 +67,9 @@ The site names three addresses. Netlify does not host email, so create them (as 
 
 | Address | Used in |
 | --- | --- |
-| `hello@acesside.com` | Contact page, Legal notice, Accessibility |
+| `hello@acesside.com` | Contact page, Legal notice, Accessibility statement |
 | `privacy@acesside.com` | Privacy Notice, Contact page |
-| `security@acesside.com` | `security.txt`, Contact page |
+| `security@acesside.com` | `security.txt` (the public security contact file) |
 
 Until they exist, mail to them bounces. To use one address for everything, edit `contact` in `site.config.json`.
 
@@ -67,13 +79,13 @@ At your DNS host, also set **SPF, DKIM and DMARC** for your mail provider, so no
 
 - `curl -I https://acesside.com` shows the security headers (`Content-Security-Policy`, `Strict-Transport-Security`, and the rest).
 - Run a header scan (securityheaders.com or Mozilla Observatory) and a Lighthouse pass. The site was built to pass cleanly, but I could not run them against the live domain.
-- LinkedIn is the Brand Book's first channel: paste the address into LinkedIn's **Post Inspector** so it caches the share card (`og-image.png`).
+- LinkedIn is the Brand Book's first channel: paste the address into LinkedIn's **Post Inspector** so it caches the share card (`og-image.png`, now black and white).
 - Submit `https://acesside.com/sitemap.xml` in Google Search Console and Bing Webmaster Tools.
 - Check `https://acesside.com/.well-known/security.txt` loads.
 
 ## 7. Keeping it healthy
 
 - `security.txt` expires about 11 months after each build. **Redeploy at least every 10 months** (Netlify → Deploys → Trigger deploy) or edit the build to extend it.
-- Edit `site.config.json` when the legal entity is registered (name, country, address) and when the Doctrine is approved (set `doctrine.status` to `approved`; the draft notices disappear).
+- Edit `site.config.json` when the legal entity is registered (name, country, address).
 - Roll back: Netlify deploys are atomic. **Deploys → pick an earlier deploy → Publish deploy.**
 - Adding analytics later changes what the Privacy Notice may truthfully say. Prefer a cookieless, privacy-first tool, and update the notice first.

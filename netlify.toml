@@ -63,21 +63,74 @@
       X-Robots-Tag = "noindex, nofollow"
 
 # ---------------------------------------------------------------------------------------------
-# Short, memorable addresses.
+# Redirects.
+# The site publishes very little on purpose. These paths belong to pages that are no longer part of the
+# public site (see docs/HANDOVER.md). Anyone holding an old link, or a search engine that saw an earlier
+# deploy, lands on the home page instead of an error.
 # ---------------------------------------------------------------------------------------------
 [[redirects]]
+  from = "/doctrine"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/doctrine/*"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/divisions"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/divisions/*"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/call"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/call/*"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/membership"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/membership/*"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/accountability"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/accountability/*"
+  to = "/"
+  status = 301
+
+[[redirects]]
   from = "/oath"
-  to = "/membership/#oath"
+  to = "/"
   status = 301
 
 [[redirects]]
   from = "/join"
-  to = "/membership/#apply"
+  to = "/contact/"
   status = 301
 
 [[redirects]]
   from = "/signal"
-  to = "/call/#signal"
+  to = "/contact/"
   status = 301
 
 [[redirects]]

@@ -35,14 +35,11 @@ const lum = (hex) => {
 const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
 const C = { charcoal: '#444444', stone: '#A8A59F', bone: '#F7F1E8', void: '#050505', beacon: '#E8B04A' };
 const palette = [
-  ['bone on charcoal (body text on dark)', C.bone, C.charcoal, 8],
-  ['charcoal on bone (body text on light)', C.charcoal, C.bone, 8],
-  ['charcoal on beacon (button label)', C.charcoal, C.beacon, 4.5],
-  ['beacon on charcoal (focus ring, marks)', C.beacon, C.charcoal, 4.5],
-  ['bone on void', C.bone, C.void, 15],
-  ['stone on void (footer text)', C.stone, C.void, 7],
-  ['stone on charcoal (display text 24px+ only)', C.stone, C.charcoal, 3],
-  ['beacon on void', C.beacon, C.void, 4.5],
+  ['bone on void (main text)', C.bone, C.void, 15],
+  ['void on bone (text on light bands)', C.void, C.bone, 15],
+  ['void on beacon (button label)', C.void, C.beacon, 7],
+  ['beacon on void (signal, focus ring)', C.beacon, C.void, 7],
+  ['stone on void (secondary text)', C.stone, C.void, 7],
 ];
 console.log('Palette contrast');
 for (const [label, a, b, min] of palette) {
@@ -64,6 +61,9 @@ const html = Object.fromEntries(pageFiles.map((f) => [urlOf(f), readFileSync(f, 
 const text = (h) => h.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<svg[\s\S]*?<\/svg>/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&shy;/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/\s+/g, ' ');
 
 const BANNED = /\b(avengers?|marvel|assemble|armies|army|soldiers?|troops?|empire|conquest|dominion|save the world|heroes|superheroes?|destiny|awakened|the chosen|chosen (one|ones|few|people))\b/i;
+// Founders' decision (25 Nov 2026): the Doctrine and the alliance's internal structure are not published.
+// None of this vocabulary may appear anywhere in what the site serves.
+const CONFIDENTIAL = /\b(doctrine|council|concord|prosper|ascend|ward|terra|lumen|oath|initiate|candidates?|candidacy|membership|members?|ten articles|the lines|divisions?)\b/i;
 const MISSPELLED = /\bAces Side\b|\bAce Side\b|\bAces[’'] Side\b|AcesSide|\bAce's Side\b/;
 const ids = {};
 for (const [u, h] of Object.entries(html)) ids[u] = new Set([...h.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
@@ -74,6 +74,10 @@ for (const [u, h] of Object.entries(html)) {
   const t = text(h);
   ok(!BANNED.test(t), u, `banned word in copy: ${t.match(BANNED)?.[0]}`);
   ok(!BANNED.test(h), u, `banned word in markup: ${h.match(BANNED)?.[0]}`);
+  ok(!CONFIDENTIAL.test(t), u, `confidential term in copy: ${t.match(CONFIDENTIAL)?.[0]}`);
+  ok(!CONFIDENTIAL.test(h), u, `confidential term in markup: ${h.match(CONFIDENTIAL)?.[0]}`);
+  ok(!/user-scalable\s*=\s*no|maximum-scale/.test(h), u, 'viewport must allow pinch zoom');
+  ok(/viewport-fit=cover/.test(h), u, 'viewport-fit=cover missing (notched phones)');
   ok(!MISSPELLED.test(t), u, `name misspelled: ${t.match(MISSPELLED)?.[0]}`);
   ok(!/\w'\w/.test(t), u, `straight apostrophe in visible text: ${t.match(/.{15}\w'\w.{10}/)?.[0]}`);
   ok(!/\sstyle="/.test(h), u, 'inline style attribute (blocked by CSP)');
@@ -103,7 +107,13 @@ for (const [u, h] of Object.entries(html)) {
 }
 const hdr = existsSync(join(pub, '_headers')) ? readFileSync(join(pub, '_headers'), 'utf8') : '';
 ok(/Content-Security-Policy: default-src 'self'/.test(hdr) && /Strict-Transport-Security: max-age=/.test(hdr), 'site', '_headers is missing the CSP or HSTS (drag-and-drop deploys would be unprotected)');
-ok(/^\/oath\s+\/membership\/#oath\s+301/m.test(existsSync(join(pub, '_redirects')) ? readFileSync(join(pub, '_redirects'), 'utf8') : ''), 'site', '_redirects not generated');
+const redirectsFile = existsSync(join(pub, '_redirects')) ? readFileSync(join(pub, '_redirects'), 'utf8') : '';
+ok(/^\/doctrine\s+\/\s+301/m.test(redirectsFile) && /^\/membership\/\*\s+\/\s+301/m.test(redirectsFile), 'site', 'removed pages must redirect to the home page in _redirects');
+for (const f of ['robots.txt', 'sitemap.xml', 'site.webmanifest', '.well-known/security.txt']) {
+  const body = existsSync(join(pub, f)) ? readFileSync(join(pub, f), 'utf8') : '';
+  ok(!CONFIDENTIAL.test(body), f, `confidential term in ${f}: ${body.match(CONFIDENTIAL)?.[0]}`);
+}
+for (const gone of ['doctrine', 'divisions', 'call', 'membership', 'accountability']) ok(!existsSync(join(pub, gone)), 'site', `/${gone}/ must not be published`);
 const titles = Object.values(html).map((h) => h.match(/<title>([^<]*)/)[1]);
 ok(new Set(titles).size === titles.length, 'site', 'duplicate <title> values');
 
@@ -163,6 +173,43 @@ for (const [label, vp] of [['desktop', { width: 1280, height: 900 }], ['phone', 
     }
     await page.close();
   }
+  await context.close();
+}
+
+// ---- Mobile: six phone widths, touch emulation, real device pixel ratio ------------------------
+const MOBILE_WIDTHS = [320, 360, 375, 390, 412, 430];
+console.log(`Mobile checks at ${MOBILE_WIDTHS.join(', ')} px (touch, 2x)`);
+for (const w of MOBILE_WIDTHS) {
+  const context = await browser.newContext({ viewport: { width: w, height: 740 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+  for (const u of urls) {
+    const where = `${u} [mobile ${w}px]`;
+    const page = await context.newPage();
+    await page.goto(base + u, { waitUntil: 'networkidle' });
+    await page.evaluate(() => document.fonts.ready);
+    const m = await page.evaluate(() => {
+      const visible = (el) => el.getClientRects().length > 0 && !el.closest('.hp, .vh');
+      const sel = 'a.btn, button, .nav a, .site-footer a, .brand, select, textarea, label.choice, input:not([type=hidden]):not([type=checkbox]):not([type=radio])';
+      const small = [...document.querySelectorAll(sel)].filter(visible)
+        .map((el) => ({ n: (el.className || el.tagName) + ' "' + (el.textContent || el.name || '').trim().slice(0, 24) + '"', h: el.getBoundingClientRect().height }))
+        .filter((x) => x.h < 43.5);
+      const zoomy = [...document.querySelectorAll('input:not([type=hidden]):not([type=checkbox]):not([type=radio]), select, textarea')]
+        .filter(visible).filter((el) => parseFloat(getComputedStyle(el).fontSize) < 16).map((el) => el.name);
+      return { sw: document.documentElement.scrollWidth, iw: window.innerWidth, small, zoomy };
+    });
+    ok(m.sw <= m.iw, where, `horizontal overflow: ${m.sw}px content in ${m.iw}px`);
+    ok(m.small.length === 0, where, `tap targets under 44px: ${m.small.map((x) => `${x.n} ${x.h.toFixed(0)}px`).join(', ')}`);
+    ok(m.zoomy.length === 0, where, `form text under 16px makes iOS zoom in: ${m.zoomy.join(', ')}`);
+    await page.close();
+  }
+  await context.close();
+}
+// First screen: on common small phones the promise and its button must be visible without scrolling.
+for (const [w, h] of [[375, 667], [360, 640], [390, 844]]) {
+  const context = await browser.newContext({ viewport: { width: w, height: h }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+  const page = await context.newPage();
+  await page.goto(base + '/', { waitUntil: 'networkidle' });
+  const r = await page.evaluate(() => ({ h1: document.querySelector('.hero h1').getBoundingClientRect().bottom, cta: document.querySelector('.hero .btn').getBoundingClientRect().bottom }));
+  ok(r.cta <= h, `home [first screen ${w}x${h}]`, `the button ends at ${r.cta.toFixed(0)}px, below the ${h}px fold`);
   await context.close();
 }
 

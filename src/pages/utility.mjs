@@ -15,7 +15,6 @@ ${pageHero({
 })}
 <section class="band band--bone">
 <div class="wrap">
-<p class="measure">If a life is at risk right now, contact your local emergency number. Ace’s Side is not an emergency service.</p>
 <div class="actions">${btn('/', 'Back to the home page', 'primary')}</div>
 </div>
 </section>
@@ -37,7 +36,6 @@ ${pageHero({
 <div class="wrap">
 <div class="actions">
 ${btn('/', 'Go to the home page', 'primary')}
-${btn('/doctrine/', 'Read the Doctrine', 'ghost')}
 ${btn('/contact/', 'Contact us', 'ghost')}
 </div>
 </div>

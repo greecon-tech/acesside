@@ -2,14 +2,14 @@ import { esc, pageHero, fmtDate, operator } from '../layout.mjs';
 
 // Privacy notice (GDPR Articles 12 to 14). Every statement here must stay true to how the site is built:
 //   no cookies, no local storage, no JavaScript, no analytics, no third-party requests, self-hosted fonts;
-//   forms are handled by Netlify Forms (Netlify is the host and processor; Netlify screens submissions with Akismet).
-// Retention periods are proposed defaults for the founders and their lawyer to confirm (docs/LEGAL.md).
+//   the one form is handled by Netlify Forms (Netlify is the host and processor and screens submissions with Akismet).
+// Retention is a proposed default for the founders and their lawyer to confirm (docs/LEGAL.md).
 const record = (rows) => `<dl class="record">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
 
 export default {
   path: '/privacy/',
   title: 'Privacy Notice',
-  description: 'How Ace’s Side handles personal data: no cookies, no tracking, and only what you choose to send us through our forms.',
+  description: 'How Ace’s Side handles personal data: no cookies, no tracking, and only what you choose to send us.',
   body: ({ config }) => `
 ${pageHero({ eyebrow: 'Your data', title: 'Privacy<br>notice' })}
 <section class="band band--bone legal">
@@ -22,7 +22,7 @@ ${pageHero({ eyebrow: 'Your data', title: 'Privacy<br>notice' })}
 <ul>
 <li>This site sets no cookies and runs no analytics, advertising or tracking.</li>
 <li>Every file, including the fonts, comes from our own domain.</li>
-<li>We collect personal data only if you send us a form or an email, and we use it only to deal with what you sent.</li>
+<li>We collect personal data only if you send us a message, and we use it only to answer it.</li>
 <li>You can ask to see, correct or delete it at any time: <a href="mailto:${esc(config.contact.privacy)}">${esc(config.contact.privacy)}</a>.</li>
 </ul>
 </div>
@@ -41,36 +41,19 @@ ${record([
   ['Kept for', 'A short period set by our hosting provider.'],
 ])}
 
-<h3>When you raise a signal</h3>
-${record([
-  ['What', 'Your name, email address, role, organization, country, your answers to the questions on the form, and your description of the need.'],
-  ['Why', 'To assess whether and how we can respond, to answer you, and to keep a record that the signal was received and what was decided. We log every signal, including those we decline.'],
-  ['Legal basis', 'Your consent (Article 6(1)(a)), which you can withdraw at any time. For the record of the outcome: our legitimate interest in accounting for our work (Article 6(1)(f)).'],
-  ['Kept for', 'Personal details are deleted 24 months after the signal is closed. A record without personal details may be kept to support our yearly report.'],
-])}
-
-<h3>When you apply to become a candidate</h3>
-${record([
-  ['What', 'Your name, email address, country, who nominated you, the division you chose, your description of your work and motivation, and any conflicts of interest you declare.'],
-  ['Why', 'To check conflicts of interest and fit with the Articles, and to contact you about your application.'],
-  ['Legal basis', 'Your consent (Article 6(1)(a)), which you can withdraw at any time.'],
-  ['Kept for', 'If you are not accepted, 12 months after our decision. If you join, we will give you a separate notice about the records we keep for members.'],
-])}
-
 <h3>When you write to us</h3>
 ${record([
   ['What', 'Your name, email address, the topic and your message, through the contact form or by email.'],
   ['Why', 'To read and answer your message.'],
-  ['Legal basis', 'Your consent for the form (Article 6(1)(a)); our legitimate interest in answering for email you send us directly (Article 6(1)(f)).'],
+  ['Legal basis', 'Your consent for the form, which you can withdraw at any time (Article 6(1)(a)). Our legitimate interest in answering, for email you send us directly (Article 6(1)(f)).'],
   ['Kept for', '12 months after our last message to you.'],
 ])}
 
 <h2>Who else handles your data</h2>
 <ul>
-<li><strong>Netlify, Inc.</strong> (United States) hosts this site, stores what you send through our forms, and passes it on to us. It acts on our instructions as our processor.</li>
+<li><strong>Netlify, Inc.</strong> (United States) hosts this site, stores what you send through the contact form, and passes it on to us. It acts on our instructions as our processor.</li>
 <li><strong>Akismet</strong> (Automattic Inc., United States). Netlify checks form submissions for spam with Akismet. Akismet receives the content of the submission with technical data such as your IP address and browser type.</li>
-<li><strong>Our email provider</strong>, which delivers the notifications and messages that reach our mailboxes.</li>
-<li><strong>Members of Ace’s Side</strong> who handle signals, applications and messages, on a need-to-know basis.</li>
+<li><strong>Our email provider</strong>, which delivers the messages that reach our mailboxes.</li>
 <li><strong>Public authorities</strong>, only where the law requires it.</li>
 </ul>
 <p>We do not sell your data, and we do not use it for advertising.</p>
@@ -97,7 +80,7 @@ ${record([
 <p>This site is not aimed at children. Please do not send us personal data about children.</p>
 
 <h2>Security</h2>
-<p>The site is served over HTTPS only, with security headers that limit what a page can load or do. Submissions are stored by our host and are reachable only by the people who handle them. Please do not send sensitive personal data, such as health details, unless it is essential to your request.</p>
+<p>The site is served over HTTPS only, with security headers that limit what a page can load or do. Messages are stored by our host and are reachable only by the people who handle them. Please do not send sensitive personal data, such as health details, unless it is essential.</p>
 
 <h2>Changes to this notice</h2>
 <p>If our practice changes, we will update this notice and the date at the top.</p>

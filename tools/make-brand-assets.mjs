@@ -57,7 +57,10 @@ const masters = {
   'brand/aces-side-icon-small.svg': svg(bold(COLOR.stone)),
   'brand/aces-side-medium-tile.svg': svg(square() + emblem80(COLOR.stone)),
   'brand/aces-side-app-tile.svg': svg(tile() + emblem80(COLOR.stone)),
-  'src/assets/static/favicon.svg': svg(tile() + faviconEmblem(COLOR.stone), 64),
+  // Night version (Bone on Void): the main version used on the website, icons and share card.
+  'brand/aces-side-night-tile.svg': svg(square(COLOR.void) + emblem80(COLOR.bone)),
+  'brand/aces-side-night-app-tile.svg': svg(tile(COLOR.void) + emblem80(COLOR.bone)),
+  'src/assets/static/favicon.svg': svg(tile(COLOR.void) + faviconEmblem(COLOR.bone), 64),
 };
 for (const [file, body] of Object.entries(masters)) {
   mkdirSync(dirname(join(root, file)), { recursive: true });
@@ -86,17 +89,17 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ deviceScaleFactor: 1 });
 
 // Brand-spec app tile (superellipse, transparent corners) for the web manifest.
-await shot(page, wrapSvg(tile() + emblem80(COLOR.stone), 192), out('icon-192.png'), 192, 192, { transparent: true });
-await shot(page, wrapSvg(tile() + emblem80(COLOR.stone), 512), out('icon-512.png'), 512, 512, { transparent: true });
+await shot(page, wrapSvg(tile(COLOR.void) + emblem80(COLOR.bone), 192), out('icon-192.png'), 192, 192, { transparent: true });
+await shot(page, wrapSvg(tile(COLOR.void) + emblem80(COLOR.bone), 512), out('icon-512.png'), 512, 512, { transparent: true });
 // Maskable: full-bleed so the OS can apply its own mask. Emblem sits well inside the safe zone.
-await shot(page, wrapSvg(square() + emblem80(COLOR.stone), 512), out('icon-maskable-512.png'), 512, 512);
+await shot(page, wrapSvg(square(COLOR.void) + emblem80(COLOR.bone), 512), out('icon-maskable-512.png'), 512, 512);
 // iOS applies its own rounded mask, so it gets a full-bleed square.
-await shot(page, wrapSvg(square() + emblem80(COLOR.stone), 180), out('apple-touch-icon.png'), 180, 180);
+await shot(page, wrapSvg(square(COLOR.void) + emblem80(COLOR.bone), 180), out('apple-touch-icon.png'), 180, 180);
 // Favicon sizes (bold Emblem), packed into one .ico.
 const icoParts = [];
 for (const s of [16, 32, 48]) {
   const f = join(work, `fav-${s}.png`);
-  await shot(page, wrapSvg(tile() + faviconEmblem(COLOR.stone), s), f, s, s, { transparent: true });
+  await shot(page, wrapSvg(tile(COLOR.void) + faviconEmblem(COLOR.bone), s), f, s, s, { transparent: true });
   icoParts.push(f);
 }
 execFileSync('convert', [...icoParts, out('favicon.ico')]);
@@ -105,14 +108,14 @@ execFileSync('convert', [...icoParts, out('favicon.ico')]);
 const og = `<!doctype html><meta charset="utf-8"><style>
 @font-face{font-family:M;src:url(${fontDir}michroma-400.woff2) format('woff2')}
 @font-face{font-family:I;src:url(${fontDir}inter-var.woff2) format('woff2');font-weight:100 900}
-html,body{margin:0;width:1200px;height:630px;background:${COLOR.charcoal};overflow:hidden}
+html,body{margin:0;width:1200px;height:630px;background:${COLOR.void};overflow:hidden}
 .wrap{position:absolute;inset:0;display:flex;align-items:center;padding:0 84px;gap:56px}
 svg{width:300px;height:300px;flex:none}
 .name{font:400 24px M;letter-spacing:.12em;color:${COLOR.bone};margin:0 0 28px}
 h1{font:400 41px/1.32 M;letter-spacing:.12em;color:${COLOR.bone};margin:0;white-space:nowrap}
 .rule{width:96px;height:5px;background:${COLOR.beacon};margin:34px 0 28px}
 p{font:400 26px/1.45 I;color:${COLOR.bone};margin:0;max-width:620px}
-</style><div class="wrap">${svg(mark(COLOR.stone), 300)}
+</style><div class="wrap">${svg(mark(COLOR.bone), 300)}
 <div><p class="name">ACE’S SIDE</p><h1>WHEN THE<br>WORLD NEEDS US,<br>WE ARE HERE.</h1><div class="rule"></div>
 <p>A leadership alliance that answers when the world needs it.</p></div></div>`;
 await shot(page, og, out('og-image.png'), 1200, 630);
