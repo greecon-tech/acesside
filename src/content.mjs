@@ -162,3 +162,6 @@ export const taglines = {
   secondary: 'Shaped by Presence. Guided by purpose.',
   campaign: 'Answer the call.',
 };
+
+// A line of the founders', set as a quote on the home page. No attribution: it is the alliance's own.
+export const quote = 'A team of people, standing together in service of humanity.';

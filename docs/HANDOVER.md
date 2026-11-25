@@ -58,6 +58,10 @@ Each is one line in `src/content.mjs`:
 
 ## The new copy, and the inspiration
 
+**The founders' quote:** “A team of people, standing together in service of humanity.” It is set as a pull quote on the home page, under "One cause. Many strengths.", with no attribution (`quote` in `src/content.mjs`). It did not come from the Brand Book or the Doctrine PDFs, so the founders supplied it directly.
+
+The rest of the new copy:
+
 "Hard problems are not solved by one person, one nation or one skill. They are met by people who are each excellent at something different, and who share one cause." and the closing "There is no form to fill in and no address to write to. When there is a place for you, or a need we can meet together, we reach out."
 
 The Brand Book says Ace's Side takes three things from its source of inspiration: *a team of distinct specialists, one shared cause, and the readiness to answer a call*. The new copy is built on those three. **The source is never named on the site, and none of its words, phrases or imagery are used.** The Brand Book is explicit that this is private inspiration and that its owner holds trademarks on those names and phrases. The checker fails the build if the name, "assemble", "heroes", "superpowers", "mightiest" or similar words appear.

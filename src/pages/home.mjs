@@ -1,5 +1,5 @@
 import { esc, btn, heroEmblem, starMark } from '../layout.mjs';
-import { divisions, presence, presenceQuestion, callSteps, lines } from '../content.mjs';
+import { divisions, presence, presenceQuestion, callSteps, lines, quote } from '../content.mjs';
 
 // The home page. The Doctrine is not published (no page, no link, no mention).
 // The site gives no way to contact the alliance: Ace's Side reaches out; nobody writes in.
@@ -37,8 +37,8 @@ export default {
 <h2 class="display h2 h2--big" id="who">One cause.<br>Many strengths.</h2>
 <div class="prose lead-prose">
 <p>Hard problems are not solved by one person, one nation or one skill. They are met by people who are each excellent at something different, and who share one cause.</p>
-<p>That is what Ace’s Side is built on.</p>
 </div>
+<figure class="quote"><blockquote><p>“${esc(quote)}”</p></blockquote></figure>
 </div>
 <dl class="facts">
 <div class="fact"><dt>6</dt><dd>Divisions, each covering one area of the founding text</dd></div>
