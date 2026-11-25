@@ -50,7 +50,7 @@ Everything below is on the public site, so a lawyer should read it.
 - **"Not a government, agency, UN or intergovernmental body, regulator, emergency service or security service."** (`/legal/`.) Keep it.
 - **No donations.** `/legal/` says the site takes none, and that no gift will be called tax-deductible until Ace's Side is registered to receive such gifts.
 - **Emergencies.** The Call page tells people to contact local emergency services first and says Ace's Side is not an emergency service.
-- **Inspiration.** The site never names the source of its inspiration and uses none of its words, phrases or imagery. The Brand Book flags that the owner of those names holds trademarks on them, and that the Emblem's similarity to one of that owner's logos should be reviewed by a lawyer. The word the Brand Book says never to pair with that source ("Initiative") is not on the site.
+- **Inspiration.** The site never names the source of its inspiration and uses none of its words, phrases or imagery. The Brand Book flags that the owner of those names holds trademarks on them, and that the Emblem's similarity to one of that owner's logos should be reviewed by a lawyer. The word "initiative" is used on the site (founders' decision). The Brand Book says never to pair it with any reference to that source, and the site never names the source; keep it that way.
 
 ## 4. What the site does and does not collect
 

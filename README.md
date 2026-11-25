@@ -7,7 +7,7 @@ Static, no JavaScript, no cookies, no third-party requests. Built from the Brand
 ```bash
 node build.mjs        # build into ./public
 npm start             # preview at http://localhost:8888 (with the production headers)
-npm run verify        # build, then ~940 checks: CSP, accessibility, mobile, menu, no-Doctrine, no-contact, brand rules
+npm run verify        # build, then ~1,100 checks: CSP, accessibility, mobile, menu, no-Doctrine, no-contact, brand rules
 ```
 
 `npm run verify` needs `npm install` and `npx playwright install chromium` once. `node build.mjs` needs only Node 20+.

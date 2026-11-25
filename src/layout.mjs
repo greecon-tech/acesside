@@ -54,6 +54,7 @@ export const heroEmblem = () => `<svg class="hero-emblem" viewBox="0 0 1024 1024
 // ---- Navigation ----------------------------------------------------------------------------
 // No Doctrine page and no contact page: the Doctrine is not published, and the alliance reaches out.
 const NAV = [
+  ['/#initiatives', 'Initiatives'],
   ['/divisions/', 'Divisions'],
   ['/call/', 'The Call'],
   ['/membership/', 'Membership'],

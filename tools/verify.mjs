@@ -211,6 +211,38 @@ for (const w of MOBILE_WIDTHS) {
   }
   await context.close();
 }
+// Tablets and small laptops: the header link row appears at 70rem (1120px), so check on both sides of it.
+for (const w of [768, 900, 1024, 1100, 1130, 1180]) {
+  const context = await browser.newContext({ viewport: { width: w, height: 900 } });
+  for (const u of urls) {
+    const page = await context.newPage();
+    await page.goto(base + u, { waitUntil: 'networkidle' });
+    await page.evaluate(() => document.fonts.ready);
+    const m = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth, hh: document.querySelector('.site-header').getBoundingClientRect().height }));
+    ok(m.sw <= m.iw, `${u} [tablet ${w}px]`, `horizontal overflow: ${m.sw}px content in ${m.iw}px`);
+    ok(m.hh <= 80, `${u} [tablet ${w}px]`, `header is ${m.hh.toFixed(0)}px tall: the link row wrapped`);
+    // Nothing in the header may wrap onto a second line: the name, the Menu button, or any inline link.
+    const wrapped = await page.evaluate(() => {
+      // Count the lines of visible text: one client rect per line of each text node (hidden text has none).
+      const lines = (el) => {
+        const tops = new Set();
+        const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+        for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+          if (!n.textContent.trim()) continue;
+          const r = document.createRange();
+          r.selectNodeContents(n);
+          for (const q of r.getClientRects()) if (q.width > 0) tops.add(Math.round(q.top));
+        }
+        return tops.size;
+      };
+      return [...document.querySelectorAll('.site-header .brand__name, .site-header .menu summary, .site-header .menu li a')]
+        .filter((el) => lines(el) > 1).map((el) => el.textContent.trim().replace(/\s+/g, ' '));
+    });
+    ok(wrapped.length === 0, `${u} [tablet ${w}px]`, `header text wraps onto two lines: ${wrapped.join(', ')}`);
+    await page.close();
+  }
+  await context.close();
+}
 // First screen: on common small phones the Emblem, the promise and the description must be visible without scrolling.
 for (const [w, h] of [[375, 667], [360, 640], [390, 844]]) {
   const context = await browser.newContext({ viewport: { width: w, height: h }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
@@ -224,7 +256,7 @@ for (const [w, h] of [[375, 667], [360, 640], [390, 844]]) {
 // ---- Navigation menu: a native <details> disclosure (no JavaScript) --------------------------------
 {
   const links = (page) => page.locator('.menu li a');
-  const visible = async (page) => Promise.all([0, 1, 2, 3].map((i) => links(page).nth(i).isVisible()));
+  const visible = async (page) => { const n = await links(page).count(); return Promise.all([...Array(n).keys()].map((i) => links(page).nth(i).isVisible())); };
   // Phone: closed by default behind a Menu button; opens on tap; each link is a big tap target.
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
   const mp = await phone.newPage();
@@ -232,7 +264,8 @@ for (const [w, h] of [[375, 667], [360, 640], [390, 844]]) {
   ok(await mp.locator('.menu summary').isVisible(), 'menu [phone]', 'the Menu button must be visible on a phone');
   ok((await visible(mp)).every((v) => !v), 'menu [phone]', 'the links must be hidden until the Menu is opened');
   await mp.tap('.menu summary');
-  ok((await visible(mp)).every(Boolean), 'menu [phone]', 'tapping Menu must show all four links');
+  ok((await visible(mp)).every(Boolean), 'menu [phone]', 'tapping Menu must show every link');
+  ok((await links(mp).count()) >= 5, 'menu [phone]', 'expected the five menu links');
   const heights = await links(mp).evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height));
   ok(heights.every((h) => h >= 44), 'menu [phone]', `menu links are under 44px tall: ${heights.join(', ')}`);
   ok(await mp.locator('.site-header').evaluate((h) => h.getBoundingClientRect().height <= 70), 'menu [phone]', 'the closed header must be a single row');
@@ -245,7 +278,7 @@ for (const [w, h] of [[375, 667], [360, 640], [390, 844]]) {
   const dp = await desk.newPage();
   await dp.goto(base + '/', { waitUntil: 'networkidle' });
   ok(!(await dp.locator('.menu summary').isVisible()), 'menu [desktop]', 'no Menu button on a wide screen');
-  ok((await visible(dp)).every(Boolean), 'menu [desktop]', 'all four links must show in the header row');
+  ok((await visible(dp)).every(Boolean), 'menu [desktop]', 'every link must show in the header row');
   await desk.close();
   // Keyboard: Tab reaches the Menu button, Enter opens it, Tab then reaches the first link.
   const kb = await browser.newContext({ viewport: { width: 700, height: 700 } });
@@ -256,7 +289,7 @@ for (const [w, h] of [[375, 667], [360, 640], [390, 844]]) {
   await kp.keyboard.press('Enter');
   ok(await kp.evaluate(() => document.querySelector('.menu').open), 'menu [keyboard]', 'Enter must open the menu');
   await kp.keyboard.press('Tab');
-  ok(await kp.evaluate(() => document.activeElement?.textContent.trim() === 'Divisions'), 'menu [keyboard]', 'Tab after opening must reach the first link');
+  ok(await kp.evaluate(() => document.activeElement === document.querySelector('.menu li a')), 'menu [keyboard]', 'Tab after opening must reach the first link');
   await kb.close();
 }
 

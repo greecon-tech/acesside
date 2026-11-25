@@ -75,7 +75,7 @@ main:focus{outline:none}
 .site-header__in{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:var(--header-h)}
 .brand{display:inline-flex;align-items:center;gap:.75rem;text-decoration:none;color:var(--bone);min-height:2.75rem}
 .brand__mark{width:2.25rem;height:2.25rem;fill:var(--bone);color:var(--bone);flex:none}
-.brand__name{font:400 .95rem/1 var(--display);letter-spacing:.12em}
+.brand__name{font:400 .95rem/1 var(--display);letter-spacing:.12em;white-space:nowrap}
 /* Navigation is a native <details> disclosure: a Menu button on phones, a row of links on wide screens.
    No JavaScript. */
 .menu{position:relative}
@@ -91,16 +91,16 @@ main:focus{outline:none}
 .menu li a{display:flex;align-items:center;min-height:3.25rem;padding:0 1.25rem;font:400 .8rem/1.2 var(--display);letter-spacing:.14em;text-transform:uppercase;text-decoration:none}
 .menu li a:hover{background:var(--bone);color:var(--void)}
 .menu li a[aria-current="page"]{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.5em}
-/* Wide screens: the links sit in the header row. Only where the browser can show the closed content;
+/* Wide screens (1120px up, where five links fit on one line with room to spare): the links sit in the header row. Only where the browser can show the closed content;
    older browsers keep the working dropdown. */
-@media (min-width:56rem){
+@media (min-width:70rem){
   @supports selector(details::details-content){
     .menu summary{display:none}
     .menu::details-content{content-visibility:visible;display:block}
     .menu nav{position:static;width:auto;background:none;border:0}
-    .menu ul{display:flex;gap:.25rem 1.75rem}
+    .menu ul{display:flex;gap:.25rem 1.5rem}
     .menu li+li{border-top:0}
-    .menu li a{min-height:2.75rem;padding:0 .25rem;font-size:.72rem}
+    .menu li a{min-height:2.75rem;padding:0 .25rem;font-size:.72rem;white-space:nowrap}
     .menu li a:hover{background:none;color:inherit;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.5em}
   }
 }
@@ -186,6 +186,15 @@ main:focus{outline:none}
 @media (min-width:48rem){.presence li{grid-template-columns:14rem minmax(0,1fr);align-items:baseline}}
 .pull{margin-top:2.25rem;max-width:36rem;padding-left:1.25rem;border-left:3px solid var(--stone);font-size:clamp(1.125rem,1rem + .6vw,1.4rem);line-height:1.5}
 .pull strong{display:block;font:400 .72rem/1.4 var(--display);letter-spacing:.16em;text-transform:uppercase;margin-bottom:.75rem;color:var(--stone)}
+/* initiatives: the main one is set in a bordered card; the section sits under a hairline inside the Presence band */
+.initiatives{margin-top:clamp(2.5rem,7vw,4.5rem);padding-top:clamp(2.25rem,6vw,3.5rem);border-top:1px solid var(--line-dark)}
+.initiative{margin-top:1.5rem;padding:1.5rem;border:1px solid var(--bone);display:grid;gap:.7rem;max-width:44rem}
+.initiative__label{font:400 .72rem/1.4 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--stone)}
+.initiative h3{font:400 clamp(1.15rem,1rem + 1vw,1.6rem)/1.3 var(--display);letter-spacing:.12em;text-transform:uppercase;font-synthesis:none}
+.initiative p:not([class]){max-width:34rem}
+.initiative__status{display:flex;align-items:center;gap:.6rem;margin-top:.25rem;font-size:.9375rem;color:var(--stone)}
+.initiative__status::before{content:"";width:.55rem;height:.55rem;background:var(--bone);flex:none}
+.initiatives__more{margin-top:1.5rem;max-width:36rem;color:var(--stone)}
 /* division cards */
 .cards{display:grid;grid-template-columns:1fr;gap:1px;margin-top:2rem;background:var(--line-light);border:1px solid var(--line-light)}
 @media (min-width:36rem){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}

@@ -1,5 +1,5 @@
 import { esc, btn, heroEmblem, starMark } from '../layout.mjs';
-import { divisions, presence, presenceQuestion, callSteps, lines, quote } from '../content.mjs';
+import { divisions, presence, presenceQuestion, callSteps, lines, quote, mainInitiative, initiativesNote } from '../content.mjs';
 
 // The home page. The Doctrine is not published (no page, no link, no mention).
 // The site gives no way to contact the alliance: Ace's Side reaches out; nobody writes in.
@@ -58,6 +58,17 @@ export default {
 ${presence.map((p) => `<li><strong>${esc(p.name)}</strong><span>${esc(p.text)}</span></li>`).join('\n')}
 </ul>
 <p class="pull"><strong>Before any decision</strong>${esc(presenceQuestion)}</p>
+
+<div class="initiatives" id="initiatives">
+<h2 class="display h2" id="initiatives-h">Our initiatives</h2>
+<article class="initiative">
+<p class="initiative__label">${esc(mainInitiative.label)}</p>
+<h3>${esc(mainInitiative.name)}</h3>
+<p>${esc(mainInitiative.text)}</p>
+<p class="initiative__status">${esc(mainInitiative.status)}</p>
+</article>
+<p class="initiatives__more">${esc(initiativesNote)}</p>
+</div>
 </div>
 </section>
 

@@ -60,7 +60,9 @@ Each is one line in `src/content.mjs`:
 
 **The founders' quote:** “A team of people, standing together in service of humanity.” It is set as a pull quote on the home page, under "One cause. Many strengths.", with no attribution (`quote` in `src/content.mjs`). It did not come from the Brand Book or the Doctrine PDFs, so the founders supplied it directly.
 
-**Purpose, in public words:** "Building Presence is why Ace's Side exists." It opens the Presence section on the home page, whose label is now "Why we exist". Stated this way it is the founders' purpose in the coded form they use publicly. The word "initiative" is deliberately not used on the site (the Brand Book's legal section flags it); the plain wording says the same thing.
+**Purpose, in public words:** "Building Presence is why Ace's Side exists." It opens the Presence section on the home page, whose label is now "Why we exist". Stated this way it is the founders' purpose in the coded form they use publicly.
+
+**Initiatives.** A section called "Our initiatives" sits inside the "Why we exist" band on the home page, and the menu links to it (`/#initiatives`). It states **one** initiative, "Building Presence" (our main initiative, status: In progress), in the coded public wording, and says other initiatives "will follow. We announce them when they are ready, not before." No other initiative is invented: **send me the others and I will add each one** (they live in `src/content.mjs`). The word "initiative" is used freely on the site now. The Brand Book's INITIATIVE descriptor under the name (ACE'S SIDE / INITIATIVE) is still not in the logo lockup; say the word and I will add it.
 
 The rest of the new copy:
 
@@ -94,14 +96,14 @@ The founders keep at least one term private and share it only in coded form. It 
 
 ## Mobile
 
-Checked at six widths (320 to 430 px, touch, 2x): no sideways scroll, tap targets at least 44 px, pinch zoom allowed, safe-area padding, and the Emblem, promise and description on the first screen of common small phones. The navigation is a closed Menu button on phones and an inline row from 56 rem up; tested by tap, by keyboard and on desktop.
+Checked at six widths (320 to 430 px, touch, 2x): no sideways scroll, tap targets at least 44 px, pinch zoom allowed, safe-area padding, and the Emblem, promise and description on the first screen of common small phones. The navigation is a closed Menu button on phones and an inline row from 1120 px up (five links need that room); tested by tap, by keyboard, on desktop and at tablet widths.
 
 ## Engineering
 
 - **Stack:** plain HTML and CSS from one dependency-free Node script (`build.mjs`). No framework, no runtime JavaScript.
 - **Files:** `src/content.mjs` (the alliance's words) · `src/pages/*.mjs` (one file per page) · `src/layout.mjs` · `src/css/main.css` · `brand/` · `tools/` · `public/` (built, committed so it can be dragged into Netlify).
 - **Commands:** `node build.mjs`; `npm start` (preview with the production headers); `npm run verify` (needs `npm install` and `npx playwright install chromium` once).
-- **Verifier (about 940 checks):** the real Content-Security-Policy with no violations; no request leaves the site; no console errors; axe-core WCAG 2.2 A/AA on every page at desktop and phone width; six phone widths; the first screen; the menu; links and anchors; the name, banned-word, typeface and Beacon-star rules; the no-Doctrine rule; the no-contact rule.
+- **Verifier (about 1,100 checks):** the real Content-Security-Policy with no violations; no request leaves the site; no console errors; axe-core WCAG 2.2 A/AA on every page at desktop and phone width; six phone widths and six tablet/laptop widths (including that nothing in the header wraps); the first screen; the menu; links and anchors; the name, banned-word, typeface and Beacon-star rules; the no-Doctrine rule; the no-contact rule.
 - **Security:** strict CSP, `frame-ancestors 'none'`, HSTS, `nosniff`, referrer and permissions policies. Headers also ship in `public/_headers`, so dragging `public/` into Netlify is as protected as a Git deploy.
 - **Tested in Chromium only.** Not run in Safari or Firefox or on real phones. Worth a manual pass, especially an iPhone.
 
