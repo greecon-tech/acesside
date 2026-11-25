@@ -1,0 +1,216 @@
+#!/usr/bin/env node
+// Quality gate for the built site (./public). Run after `node build.mjs`:
+//
+//   npm install && npx playwright install chromium     (once)
+//   npm run verify
+//   SHOTS=/some/dir npm run verify                     also saves screenshots
+//
+// It serves ./public exactly as Netlify will (same headers, including the real Content-Security-Policy)
+// and checks every page for: CSP violations, requests to other origins, console errors, horizontal
+// overflow at 320px, axe-core accessibility (WCAG 2.2 A/AA + best practice), broken links and anchors,
+// and the Brand Book rules (name spelling, banned words, one Beacon star per page, palette contrast).
+
+import { readFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { startServer } from './serve.mjs';
+
+const require = createRequire(import.meta.url);
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const pub = join(root, 'public');
+const { chromium } = require('playwright');
+const axeSource = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
+
+const failures = [];
+const fail = (where, msg) => failures.push(`${where}: ${msg}`);
+let checks = 0;
+const ok = (cond, where, msg) => { checks++; if (!cond) fail(where, msg); };
+
+// ---- 1. Palette contrast (Brand Book "Contrast rules") ---------------------------------------
+const lum = (hex) => {
+  const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+};
+const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+const C = { charcoal: '#444444', stone: '#A8A59F', bone: '#F7F1E8', void: '#050505', beacon: '#E8B04A' };
+const palette = [
+  ['bone on charcoal (body text on dark)', C.bone, C.charcoal, 8],
+  ['charcoal on bone (body text on light)', C.charcoal, C.bone, 8],
+  ['charcoal on beacon (button label)', C.charcoal, C.beacon, 4.5],
+  ['beacon on charcoal (focus ring, marks)', C.beacon, C.charcoal, 4.5],
+  ['bone on void', C.bone, C.void, 15],
+  ['stone on void (footer text)', C.stone, C.void, 7],
+  ['stone on charcoal (display text 24px+ only)', C.stone, C.charcoal, 3],
+  ['beacon on void', C.beacon, C.void, 4.5],
+];
+console.log('Palette contrast');
+for (const [label, a, b, min] of palette) {
+  const r = ratio(a, b);
+  console.log(`  ${r.toFixed(2)}:1  ${label}  (needs ${min})`);
+  ok(r >= min, 'palette', `${label} is ${r.toFixed(2)}:1, needs ${min}`);
+}
+
+// ---- 2. Static checks on the built HTML -------------------------------------------------------
+const pageFiles = [];
+(function walk(dir) {
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) walk(p); else if (e.name.endsWith('.html')) pageFiles.push(p);
+  }
+})(pub);
+const urlOf = (f) => '/' + f.slice(pub.length + 1).replace(/index\.html$/, '');
+const html = Object.fromEntries(pageFiles.map((f) => [urlOf(f), readFileSync(f, 'utf8')]));
+const text = (h) => h.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<svg[\s\S]*?<\/svg>/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&shy;/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/\s+/g, ' ');
+
+const BANNED = /\b(avengers?|marvel|assemble|armies|army|soldiers?|troops?|empire|conquest|dominion|save the world|heroes|superheroes?|destiny|awakened|the chosen|chosen (one|ones|few|people))\b/i;
+const MISSPELLED = /\bAces Side\b|\bAce Side\b|\bAces[’'] Side\b|AcesSide|\bAce's Side\b/;
+const ids = {};
+for (const [u, h] of Object.entries(html)) ids[u] = new Set([...h.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
+const redirects = new Set([...readFileSync(join(root, 'netlify.toml'), 'utf8').matchAll(/from = "([^"]+)"/g)].map((m) => m[1]));
+const exists = (p) => p in html || existsSync(join(pub, p)) && !/\/$/.test(p) || redirects.has(p);
+
+for (const [u, h] of Object.entries(html)) {
+  const t = text(h);
+  ok(!BANNED.test(t), u, `banned word in copy: ${t.match(BANNED)?.[0]}`);
+  ok(!BANNED.test(h), u, `banned word in markup: ${h.match(BANNED)?.[0]}`);
+  ok(!MISSPELLED.test(t), u, `name misspelled: ${t.match(MISSPELLED)?.[0]}`);
+  ok(!/\w'\w/.test(t), u, `straight apostrophe in visible text: ${t.match(/.{15}\w'\w.{10}/)?.[0]}`);
+  ok(!/\sstyle="/.test(h), u, 'inline style attribute (blocked by CSP)');
+  ok(!/\son[a-z]+="/.test(h), u, 'inline event handler (blocked by CSP)');
+  ok(!/<script(?![^>]*application\/ld\+json)[^>]*>/.test(h), u, 'unexpected script element: the site ships no JavaScript');
+  ok((h.match(/class="btn__star"/g) || []).length <= 1, u, 'more than one Beacon star accent on a page');
+  ok(/<html lang="en">/.test(h), u, 'missing lang');
+  ok(/<title>[^<]{3,}<\/title>/.test(h), u, 'missing title');
+  ok(/<meta name="description" content="[^"]{20,}"/.test(h), u, 'missing description');
+  ok(!/<img\b(?![^>]*\balt=)/.test(h), u, 'img without alt');
+  // internal links and anchors
+  for (const [, href] of h.matchAll(/\shref="([^"]+)"/g)) {
+    if (!href.startsWith('/') && !href.startsWith('#')) continue;
+    const [path0, frag] = href.split('#');
+    const path = path0 || u;
+    if (path.startsWith('/assets/') || /\.(png|ico|svg|txt|xml|webmanifest)$/.test(path) || path.startsWith('/.well-known/')) { ok(existsSync(join(pub, path)), u, `missing file ${path}`); continue; }
+    ok(exists(path), u, `broken link ${href}`);
+    if (frag && !redirects.has(path)) ok(ids[path]?.has(frag), u, `anchor #${frag} not found on ${path}`);
+  }
+  // forms
+  for (const [, f] of h.matchAll(/<form\b([\s\S]*?)<\/form>/g)) {
+    const name = f.match(/name="([^"]+)"/)?.[1];
+    ok(/data-netlify="true"/.test(f) && /netlify-honeypot="bot-field"/.test(f), u, `form ${name}: missing Netlify attributes`);
+    ok(new RegExp(`name="form-name" value="${name}"`).test(f), u, `form ${name}: hidden form-name mismatch`);
+    ok(/name="consent"[^>]*required/.test(f), u, `form ${name}: consent checkbox must be required`);
+  }
+}
+const hdr = existsSync(join(pub, '_headers')) ? readFileSync(join(pub, '_headers'), 'utf8') : '';
+ok(/Content-Security-Policy: default-src 'self'/.test(hdr) && /Strict-Transport-Security: max-age=/.test(hdr), 'site', '_headers is missing the CSP or HSTS (drag-and-drop deploys would be unprotected)');
+ok(/^\/oath\s+\/membership\/#oath\s+301/m.test(existsSync(join(pub, '_redirects')) ? readFileSync(join(pub, '_redirects'), 'utf8') : ''), 'site', '_redirects not generated');
+const titles = Object.values(html).map((h) => h.match(/<title>([^<]*)/)[1]);
+ok(new Set(titles).size === titles.length, 'site', 'duplicate <title> values');
+
+// ---- 3. Browser checks -------------------------------------------------------------------------
+const server = await startServer(8899);
+const base = 'http://localhost:8899';
+const browser = await chromium.launch();
+const shotsDir = process.env.SHOTS;
+if (shotsDir) mkdirSync(shotsDir, { recursive: true });
+const urls = Object.keys(html).sort();
+console.log(`\nBrowser checks on ${urls.length} pages (desktop 1280px, phone 320px)`);
+
+for (const [label, vp] of [['desktop', { width: 1280, height: 900 }], ['phone', { width: 320, height: 640 }]]) {
+  const context = await browser.newContext({ viewport: vp, deviceScaleFactor: 1 });
+  for (const u of urls) {
+    const where = `${u} [${label}]`;
+    const page = await context.newPage();
+    const problems = [];
+    const foreign = [];
+    page.on('console', (m) => { if (['error', 'warning'].includes(m.type())) problems.push(`console ${m.type()}: ${m.text()}`); });
+    page.on('pageerror', (e) => problems.push(`page error: ${e.message}`));
+    page.on('requestfailed', (r) => problems.push(`request failed: ${r.url()}`));
+    page.on('request', (r) => { if (!r.url().startsWith(base) && !r.url().startsWith('data:')) foreign.push(r.url()); });
+    page.on('response', (r) => { if (r.status() >= 400 && !u.endsWith('404.html')) problems.push(`HTTP ${r.status()}: ${r.url()}`); });
+    const res = await page.goto(base + u, { waitUntil: 'networkidle' });
+    await page.evaluate(() => document.fonts.ready);
+    ok(res.status() === 200, where, `HTTP ${res.status()}`);
+    const h = res.headers();
+    ok(/default-src 'self'/.test(h['content-security-policy'] || ''), where, 'CSP header missing');
+    ok(h['x-content-type-options'] === 'nosniff', where, 'nosniff header missing');
+    ok(/max-age=\d+/.test(h['strict-transport-security'] || ''), where, 'HSTS header missing');
+    ok(foreign.length === 0, where, `requests to other origins: ${foreign.join(', ')}`);
+    for (const p of problems) fail(where, p);
+    checks++;
+    const m = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth, h1: document.querySelectorAll('h1').length }));
+    ok(m.sw <= m.iw, where, `horizontal overflow: content ${m.sw}px wide in a ${m.iw}px window`);
+    ok(m.h1 === 1, where, `${m.h1} <h1> elements`);
+    // Brand Book: never more than two typefaces on one page.
+    const faces = await page.evaluate(() => {
+      const used = new Set();
+      for (const el of document.body.querySelectorAll('*')) {
+        if (el.closest('.sprite, .vh') || !el.childNodes.length) continue;
+        if (![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue;
+        used.add(getComputedStyle(el).fontFamily.split(',')[0].replace(/["']/g, '').trim());
+      }
+      return [...used];
+    });
+    ok(faces.length <= 2, where, `more than two typefaces on the page: ${faces.join(', ')}`);
+    // axe-core against WCAG 2.2 A/AA and best practice
+    await page.evaluate(axeSource);
+    const axe = await page.evaluate(() => window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'] } }));
+    for (const v of axe.violations) fail(where, `axe ${v.id} (${v.impact}): ${v.help} → ${v.nodes.slice(0, 2).map((n) => n.target.join(' ')).join(' | ')}`);
+    checks++;
+    if (shotsDir && ['/', '/doctrine/', '/call/', '/membership/', '/divisions/', '/privacy/', '/accountability/', '/contact/'].includes(u)) {
+      await page.waitForTimeout(label === 'desktop' && u === '/' ? 5200 : 200); // let the hero animation finish
+      await page.screenshot({ path: join(shotsDir, `${label}${u.replace(/\//g, '_') || '_'}png`.replace('_png', '.png')), fullPage: true });
+    }
+    await page.close();
+  }
+  await context.close();
+}
+
+// Keyboard: the first Tab stop on every page must be the skip link, and Enter must move focus to <main>.
+{
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await context.newPage();
+  await page.goto(base + '/');
+  await page.keyboard.press('Tab');
+  ok(await page.evaluate(() => document.activeElement?.classList.contains('skip')), 'keyboard', 'first Tab stop is not the skip link');
+  await page.keyboard.press('Enter');
+  ok(await page.evaluate(() => document.activeElement?.id === 'main'), 'keyboard', 'skip link does not move focus to main');
+  // Form flow: a valid signal submits and lands on the confirmation page.
+  await page.goto(base + '/contact/');
+  await page.fill('#contact-name', 'Test Person');
+  await page.fill('#contact-email', 'test@example.com');
+  await page.selectOption('#contact-topic', { index: 1 });
+  await page.fill('#contact-message', 'Hello.');
+  await page.check('#contact-consent');
+  await Promise.all([page.waitForURL(/.*/), page.click('button[type=submit]')]);
+  ok(/Thank you/i.test(await page.locator('h1').innerText()), 'forms', 'contact form did not reach the confirmation page');
+  // Without consent the browser must refuse to submit.
+  await page.goto(base + '/contact/');
+  await page.fill('#contact-name', 'Test Person');
+  await page.fill('#contact-email', 'test@example.com');
+  await page.selectOption('#contact-topic', { index: 1 });
+  await page.fill('#contact-message', 'Hello.');
+  await page.click('button[type=submit]');
+  ok(await page.evaluate(() => !document.querySelector('#contact-consent').validity.valid), 'forms', 'form can be submitted without consent');
+  await context.close();
+}
+
+// Reduced motion: the Emblem must be fully visible with no animation.
+{
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  await page.goto(base + '/');
+  const r = await page.evaluate(() => [...document.querySelectorAll('.hero-emblem use')].map((u) => [getComputedStyle(u).animationName, getComputedStyle(u).opacity]));
+  ok(r.length === 4 && r.every(([a, o]) => a === 'none' && o === '1'), 'motion', `reduced-motion emblem not static: ${JSON.stringify(r)}`);
+  await context.close();
+}
+
+await browser.close();
+server.close();
+
+console.log(`\n${checks} checks run.`);
+if (failures.length) {
+  console.error(`\n${failures.length} FAILED:\n  - ${failures.join('\n  - ')}`);
+  process.exit(1);
+}
+console.log('All checks passed.');

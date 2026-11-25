@@ -1,0 +1,25 @@
+{
+  "name": "Ace’s Side",
+  "origin": "https://acesside.com",
+  "tagline": "When the world needs us, we are here.",
+  "description": "Ace’s Side is a leadership alliance that answers when the world needs it, uniting innovation and ethics through Presence.",
+  "contact": {
+    "general": "hello@acesside.com",
+    "privacy": "privacy@acesside.com",
+    "security": "security@acesside.com"
+  },
+  "doctrine": {
+    "version": "1.0",
+    "status": "draft",
+    "date": "2026-11-24"
+  },
+  "entity": {
+    "legalName": null,
+    "country": null,
+    "address": null
+  },
+  "updated": "2026-11-25",
+  "social": {
+    "linkedin": null
+  }
+}

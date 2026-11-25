@@ -1,0 +1,6 @@
+/oath  /membership/#oath  301
+/join  /membership/#apply  301
+/signal  /call/#signal  301
+/privacy-policy  /privacy/  301
+/terms  /legal/  301
+/security.txt  /.well-known/security.txt  301

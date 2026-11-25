@@ -1,0 +1,96 @@
+# Netlify configuration for acesside.com
+# Netlify runs the build below on every deploy. See docs/DEPLOY.md for the full launch steps.
+
+[build]
+  command = "node build.mjs"
+  publish = "public"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # Soft launch: set SITE_INDEXING=off in Netlify (Site configuration > Environment variables)
+  # to add noindex to every page and make robots.txt disallow all, until the founders are ready.
+
+# ---------------------------------------------------------------------------------------------
+# Security headers, applied to every response.
+#
+# The site ships no inline scripts, no inline styles and no third-party requests, so the
+# Content-Security-Policy can be strict: everything must come from our own domain.
+#   - form-action 'self'      forms post only to this site (Netlify Forms)
+#   - frame-ancestors 'none'  nobody can put this site in a frame (clickjacking)
+#   - base-uri / object-src   closed
+# HSTS: one year, deliberately without includeSubDomains or preload for now. Add those only after
+# every subdomain of acesside.com (for example a mail host) is confirmed to work over HTTPS.
+# ---------------------------------------------------------------------------------------------
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+    Strict-Transport-Security = "max-age=31536000"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+    Cross-Origin-Opener-Policy = "same-origin"
+
+# Hashed assets never change under the same name, so they can be cached for a year.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Icons and the social image keep fixed names; let them be cached for a day.
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/.well-known/security.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+
+# Preview and branch deploys must never be indexed.
+[context.deploy-preview]
+  [[context.deploy-preview.headers]]
+    for = "/*"
+    [context.deploy-preview.headers.values]
+      X-Robots-Tag = "noindex, nofollow"
+
+[context.branch-deploy]
+  [[context.branch-deploy.headers]]
+    for = "/*"
+    [context.branch-deploy.headers.values]
+      X-Robots-Tag = "noindex, nofollow"
+
+# ---------------------------------------------------------------------------------------------
+# Short, memorable addresses.
+# ---------------------------------------------------------------------------------------------
+[[redirects]]
+  from = "/oath"
+  to = "/membership/#oath"
+  status = 301
+
+[[redirects]]
+  from = "/join"
+  to = "/membership/#apply"
+  status = 301
+
+[[redirects]]
+  from = "/signal"
+  to = "/call/#signal"
+  status = 301
+
+[[redirects]]
+  from = "/privacy-policy"
+  to = "/privacy/"
+  status = 301
+
+[[redirects]]
+  from = "/terms"
+  to = "/legal/"
+  status = 301
+
+[[redirects]]
+  from = "/security.txt"
+  to = "/.well-known/security.txt"
+  status = 301
