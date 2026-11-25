@@ -53,6 +53,7 @@ const faviconEmblem = (fill) =>
 const masters = {
   'brand/aces-side-medium-mark.svg': svg(mark(COLOR.stone)),
   'brand/mark-ink.svg': svg(mark(COLOR.charcoal)),
+  'brand/aces-side-black-mark.svg': svg(mark(COLOR.void)), // black (Void) Emblem, transparent ground
   'brand/mark-cream.svg': svg(mark(COLOR.bone)),
   'brand/aces-side-icon-small.svg': svg(bold(COLOR.stone)),
   'brand/aces-side-medium-tile.svg': svg(square() + emblem80(COLOR.stone)),
@@ -119,6 +120,11 @@ p{font:400 26px/1.45 I;color:${COLOR.bone};margin:0;max-width:620px}
 <div><p class="name">ACE’S SIDE</p><h1>WHEN THE<br>WORLD NEEDS US,<br>WE ARE HERE.</h1><div class="rule"></div>
 <p>A leadership alliance that answers when the world needs it.</p></div></div>`;
 await shot(page, og, out('og-image.png'), 1200, 630);
+
+// Black (Void #050505) Emblem on a transparent ground, 2048 x 2048: for use on light backgrounds.
+mkdirSync(join(root, 'brand/exports'), { recursive: true });
+await shot(page, wrapSvg(mark(COLOR.void), 2048), join(root, 'brand/exports/aces-side-emblem-black.png'), 2048, 2048, { transparent: true });
+console.log('wrote brand/exports/aces-side-emblem-black.png');
 
 await browser.close();
 rmSync(work, { recursive: true, force: true });
