@@ -15,6 +15,7 @@ import { createRequire } from 'node:module';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { startServer } from './serve.mjs';
+import { leaks } from './guard.mjs';
 
 const require = createRequire(import.meta.url);
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -110,6 +111,12 @@ const hdr = existsSync(join(pub, '_headers')) ? readFileSync(join(pub, '_headers
 ok(/Content-Security-Policy: default-src 'self'/.test(hdr) && /Strict-Transport-Security: max-age=/.test(hdr), 'site', '_headers is missing the CSP or HSTS (drag-and-drop deploys would be unprotected)');
 const redirectsFile = existsSync(join(pub, '_redirects')) ? readFileSync(join(pub, '_redirects'), 'utf8') : '';
 ok(/^\/doctrine\s+\/\s+301/m.test(redirectsFile) && /^\/doctrine\/\*\s+\/\s+301/m.test(redirectsFile) && /^\/contact\s+\/\s+301/m.test(redirectsFile), 'site', '/doctrine and /contact must redirect to the home page in _redirects');
+// Terms the founders keep confidential must appear nowhere: not on the site, not in the content files, not in the
+// documents. (tools/guard.mjs holds only hashes, so this file never names them. A hit prints the file, not the term.)
+for (const f of ['robots.txt', 'sitemap.xml', 'site.webmanifest']) ok(!leaks(existsSync(join(pub, f)) ? readFileSync(join(pub, f), 'utf8') : ''), f, 'contains a confidential term');
+for (const [u, h] of Object.entries(html)) ok(!leaks(h), u, 'contains a confidential term');
+const repoText = ['README.md', 'site.config.json', 'netlify.toml', 'src/content.mjs', ...readdirSync(join(root, 'src/pages')).map((n) => `src/pages/${n}`), ...readdirSync(join(root, 'docs')).map((n) => `docs/${n}`)];
+for (const f of repoText) ok(!leaks(readFileSync(join(root, f), 'utf8')), f, 'contains a confidential term: remove it from the repository');
 for (const f of ['robots.txt', 'sitemap.xml', 'site.webmanifest']) {
   const body = existsSync(join(pub, f)) ? readFileSync(join(pub, f), 'utf8') : '';
   ok(!CONFIDENTIAL.test(body), f, `confidential term in ${f}: ${body.match(CONFIDENTIAL)?.[0]}`);

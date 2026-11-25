@@ -72,6 +72,16 @@ The Brand Book says Ace's Side takes three things from its source of inspiration
 
 **The one exception: `privacy@acesside.com`, on the Privacy Notice only.** Data-protection law lets people exercise rights over their data (the host logs IP addresses) and requires the controller to say how. The page says the address is for data-protection requests only. The Legal and Accessibility pages point to the Privacy Notice instead of repeating it. See `docs/LEGAL.md` section 2: some countries also require a way to contact the site's operator.
 
+## A term kept out of public material
+
+The founders keep at least one term private and share it only in coded form. It is **not written anywhere in this repository**: not in the site, the content files, the documents, the code or the commit messages.
+
+- `tools/guard.mjs` holds salted hashes of the protected terms, not the terms. Text is split into words and every run of one to three words is hashed.
+- **`build.mjs` refuses to build** if any page contains one (so Netlify never deploys it), and leaves no half-built `public/` behind. The error names the page, never the term.
+- `tools/verify.mjs` also scans the served files, the content files, the documents and `README.md`.
+- **To protect another term** without writing it down: `node tools/hash-term.mjs "the term"`, then paste the printed hash into `SECRET_HASHES` in `tools/guard.mjs`.
+- **Limit:** a hash hides a term from anyone reading the repository, but a short, guessable phrase can be recovered by guessing and hashing it. This stops accidents and casual reading, not a determined attacker. Keep the repository private.
+
 ## Brand and design
 
 - **Main look: Night, Bone on Void.** Beacon amber appears as the rule under headlines and as the single star above "Answer the call".
@@ -89,7 +99,7 @@ Checked at six widths (320 to 430 px, touch, 2x): no sideways scroll, tap target
 - **Stack:** plain HTML and CSS from one dependency-free Node script (`build.mjs`). No framework, no runtime JavaScript.
 - **Files:** `src/content.mjs` (the alliance's words) · `src/pages/*.mjs` (one file per page) · `src/layout.mjs` · `src/css/main.css` · `brand/` · `tools/` · `public/` (built, committed so it can be dragged into Netlify).
 - **Commands:** `node build.mjs`; `npm start` (preview with the production headers); `npm run verify` (needs `npm install` and `npx playwright install chromium` once).
-- **Verifier (about 910 checks):** the real Content-Security-Policy with no violations; no request leaves the site; no console errors; axe-core WCAG 2.2 A/AA on every page at desktop and phone width; six phone widths; the first screen; the menu; links and anchors; the name, banned-word, typeface and Beacon-star rules; the no-Doctrine rule; the no-contact rule.
+- **Verifier (about 940 checks):** the real Content-Security-Policy with no violations; no request leaves the site; no console errors; axe-core WCAG 2.2 A/AA on every page at desktop and phone width; six phone widths; the first screen; the menu; links and anchors; the name, banned-word, typeface and Beacon-star rules; the no-Doctrine rule; the no-contact rule.
 - **Security:** strict CSP, `frame-ancestors 'none'`, HSTS, `nosniff`, referrer and permissions policies. Headers also ship in `public/_headers`, so dragging `public/` into Netlify is as protected as a Git deploy.
 - **Tested in Chromium only.** Not run in Safari or Firefox or on real phones. Worth a manual pass, especially an iPhone.
 

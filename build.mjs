@@ -13,6 +13,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { loadEmblem, renderPage } from './src/layout.mjs';
 import { parseToml } from './tools/toml-lite.mjs';
+import { leaks } from './tools/guard.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const out = join(root, 'public');
@@ -63,6 +64,8 @@ const problems = [];
 for (const p of pages) {
   const body = p.body(ctx);
   const html = renderPage(ctx, { ...p, body, jsonld: typeof p.jsonld === 'function' ? p.jsonld(ctx) : p.jsonld });
+  // A protected term must never reach a published page. Stops the deploy; never prints the term.
+  if (leaks(html)) { problems.push(`${p.path}: contains a term the founders keep confidential (see tools/guard.mjs). Nothing was published.`); continue; }
   if ((html.match(/<h1[\s>]/g) || []).length !== 1) problems.push(`${p.path}: needs exactly one <h1>`);
   if (p.description.length > 160) problems.push(`${p.path}: description is ${p.description.length} chars (max 160)`);
   write(p.file || (p.path === '/' ? 'index.html' : `${p.path.slice(1)}index.html`), html);
@@ -97,6 +100,10 @@ write('site.webmanifest', JSON.stringify({
   ],
 }, null, 2) + '\n');
 // 5. Report.
-if (problems.length) { console.error('Build problems:\n  ' + problems.join('\n  ')); process.exit(1); }
+if (problems.length) {
+  rmSync(out, { recursive: true, force: true }); // never leave a half-built site that could be dragged into Netlify
+  console.error('Build problems:\n  ' + problems.join('\n  '));
+  process.exit(1);
+}
 const count = (dir) => readdirSync(dir, { withFileTypes: true }).reduce((n, e) => n + (e.isDirectory() ? count(join(dir, e.name)) : 1), 0);
 console.log(`Built ${pages.length} pages, ${count(out)} files → public/  (indexing ${indexing ? 'ON' : 'OFF: soft launch'})`);

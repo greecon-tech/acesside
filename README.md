@@ -7,7 +7,7 @@ Static, no JavaScript, no cookies, no third-party requests. Built from the Brand
 ```bash
 node build.mjs        # build into ./public
 npm start             # preview at http://localhost:8888 (with the production headers)
-npm run verify        # build, then ~910 checks: CSP, accessibility, mobile, menu, no-Doctrine, no-contact, brand rules
+npm run verify        # build, then ~940 checks: CSP, accessibility, mobile, menu, no-Doctrine, no-contact, brand rules
 ```
 
 `npm run verify` needs `npm install` and `npx playwright install chromium` once. `node build.mjs` needs only Node 20+.
@@ -29,3 +29,5 @@ npm run verify        # build, then ~910 checks: CSP, accessibility, mobile, men
 - `public/`: the built site (committed so it can also be deployed by dragging the folder).
 
 Keep this repository private: `tools/verify.mjs` lists the Brand Book's banned words.
+
+Terms the founders keep confidential are protected by hashes in `tools/guard.mjs`; the build refuses to publish them. See `docs/HANDOVER.md`.
