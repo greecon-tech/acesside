@@ -60,6 +60,8 @@ Each is one line in `src/content.mjs`:
 
 **The founders' quote:** “A team of people, standing together in service of humanity.” It is set as a pull quote on the home page, under "One cause. Many strengths.", with no attribution (`quote` in `src/content.mjs`). It did not come from the Brand Book or the Doctrine PDFs, so the founders supplied it directly.
 
+**Purpose, in public words:** "Building Presence is why Ace's Side exists." It opens the Presence section on the home page, whose label is now "Why we exist". Stated this way it is the founders' purpose in the coded form they use publicly. The word "initiative" is deliberately not used on the site (the Brand Book's legal section flags it); the plain wording says the same thing.
+
 The rest of the new copy:
 
 "Hard problems are not solved by one person, one nation or one skill. They are met by people who are each excellent at something different, and who share one cause." and the closing "There is no form to fill in and no address to write to. When there is a place for you, or a need we can meet together, we reach out."

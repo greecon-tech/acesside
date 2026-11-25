@@ -51,9 +51,9 @@ export default {
 
 <section class="band band--void" aria-labelledby="presence">
 <div class="wrap">
-<p class="eyebrow">The principle</p>
+<p class="eyebrow">Why we exist</p>
 <h2 class="display h2" id="presence">Presence</h2>
-<p class="lead">Presence is full awareness, responsibility and empowerment, held at the same time. Every leader and every member of Ace’s Side must embody it.</p>
+<p class="lead">Building Presence is why Ace’s Side exists. Presence is full awareness, responsibility and empowerment, held at the same time. Every leader and every member of Ace’s Side must embody it.</p>
 <ul class="presence">
 ${presence.map((p) => `<li><strong>${esc(p.name)}</strong><span>${esc(p.text)}</span></li>`).join('\n')}
 </ul>
