@@ -1,4 +1,0 @@
-Contact: mailto:security@acesside.com
-Expires: 2027-10-21T17:18:30.593Z
-Preferred-Languages: en
-Canonical: https://acesside.com/.well-known/security.txt

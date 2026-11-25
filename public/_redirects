@@ -9,8 +9,11 @@
 /accountability  /  301
 /accountability/*  /  301
 /oath  /  301
-/join  /contact/  301
-/signal  /contact/  301
+/join  /  301
+/signal  /  301
+/contact  /  301
+/contact/*  /  301
+/thanks  /  301
+/thanks/*  /  301
 /privacy-policy  /privacy/  301
 /terms  /legal/  301
-/security.txt  /.well-known/security.txt  301

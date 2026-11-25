@@ -4,9 +4,7 @@
   "tagline": "When the world needs us, we are here.",
   "description": "Ace’s Side is a leadership alliance that answers when the world needs it, uniting innovation and ethics through Presence.",
   "contact": {
-    "general": "hello@acesside.com",
-    "privacy": "privacy@acesside.com",
-    "security": "security@acesside.com"
+    "privacy": "privacy@acesside.com"
   },
   "entity": {
     "legalName": null,

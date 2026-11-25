@@ -15,7 +15,7 @@ ${pageHero({ eyebrow: 'Legal', title: 'Legal notice<br>and terms' })}
 
 <h2>Who runs this site</h2>
 <p>${esc(operator(config))}</p>
-<p>Contact: <a href="mailto:${esc(config.contact.general)}">${esc(config.contact.general)}</a>.</p>
+<p>This site has no contact form. Ace’s Side contacts people itself. The one address on this site, in the <a href="/privacy/">Privacy Notice</a>, is for data-protection requests only.</p>
 
 <h2>What Ace’s Side is not</h2>
 <p>Ace’s Side is <strong>not</strong> a government, an agency of any state, the United Nations or any intergovernmental body, a regulator, an emergency service or a security service. It holds no official powers and does not claim any.</p>
@@ -28,13 +28,13 @@ ${pageHero({ eyebrow: 'Legal', title: 'Legal notice<br>and terms' })}
 <p>This site does not take donations or payments. Ace’s Side will not describe any gift as tax-deductible unless it is registered to receive such gifts.</p>
 
 <h2>Our name and Emblem</h2>
-<p>Ace’s Side, Acesside, the Emblem and the wordmark identify the alliance. Please do not use them in a way that suggests endorsement by, or affiliation with, Ace’s Side without written permission. To ask, <a href="/contact/">contact us</a>.</p>
+<p>Ace’s Side, Acesside, the Emblem and the wordmark identify the alliance. Please do not use them in a way that suggests endorsement by, or affiliation with, Ace’s Side. Permission is given only in writing by Ace’s Side.</p>
 <p>The text of this site is © 2026 Ace’s Side. You may quote short passages if you credit Ace’s Side and link to the source page.</p>
 
 <h2>Using this site</h2>
 <ul>
 <li>You may read, share and link to this site freely.</li>
-<li>Please do not misuse the contact form: no spam and no attempts to disrupt the site.</li>
+<li>Please do not attempt to disrupt the site.</li>
 <li>We work to keep the information accurate, but the site may change without notice.</li>
 <li>Links to other sites are for your convenience. We are not responsible for their content.</li>
 </ul>

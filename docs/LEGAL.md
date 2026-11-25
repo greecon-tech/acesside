@@ -14,7 +14,7 @@ The website is step 3 of the Brand Book's Rollout. Step 1, Protect, is still ope
 | File trademark applications | Open | The site uses no ™ or ® symbol. Do not add ® before registration. |
 | Confirm ownership of acesside.com, secure handles | Open | I could not look the domain up from here. |
 | Signed rights assignments from every designer | Open | Includes the Emblem and anything made with AI image tools. |
-| Division names cleared | No longer blocks the site | The names are **not** on the public site any more. They still need clearance before any public use. |
+| Division names cleared | Does not block the site | The names are **not** on the public site. They still need clearance before any public use. |
 
 Use `SITE_INDEXING=off` (see `DEPLOY.md`) if you want to deploy before these are done.
 
@@ -22,31 +22,39 @@ Use `SITE_INDEXING=off` (see `DEPLOY.md`) if you want to deploy before these are
 
 Each is one edit in `site.config.json` or one line in the named file.
 
-1. **Who is the controller and operator?** Until `entity.legalName` is set, the pages say the site is run by the founders. Fill in `entity` when the entity exists (`src/layout.mjs` → `operator()`).
-2. **Governing law and courts.** `/legal/` says they will be stated once Ace's Side is registered.
-3. **Imprint rules.** If the operator is based in Germany, Austria or another country that requires an imprint (named person, address, contact), `/legal/` must carry it.
-4. **Retention.** `/privacy/` proposes deleting contact messages 12 months after the last reply. Change it to what you will actually do, and delete submissions on that schedule.
-5. **Lawful bases.** The notice relies on consent for the contact form, and on legitimate interests for server logs and for email sent directly. Confirm.
-6. **International transfers.** Netlify (US) hosts the site and stores form submissions; Netlify uses Akismet (Automattic, US) to screen them. The notice says transfers rely on safeguards "such as the Standard Contractual Clauses". I saw that Netlify publishes a DPA that refers to the EU Standard Contractual Clauses, but I could not confirm its current terms, or whether Netlify or Akismet is certified under the EU-US Data Privacy Framework. Sign Netlify's DPA and check its sub-processor list.
-7. **Data protection officer.** The notice says none is appointed. Confirm that is right.
+1. **No contact details is a legal question.** The founders have chosen a site with no way to write to the alliance. Several rules expect an operator to be reachable, and the position depends on where the operator is:
+   - **Imprint rules** (for example Germany and Austria) require a named responsible person, a postal address and an email address on the site.
+   - **The EU e-Commerce Directive** (Article 5) expects a service provider to give an email address, which can apply to more than shops.
+   - **Data protection law** (GDPR Article 13) requires the controller's contact details. This is why the Privacy Notice carries `privacy@acesside.com`. It says the address is for data-protection requests only.
+   - **Accessibility feedback.** The Accessibility page points to the same address.
+   
+   Until the entity and country are chosen, the exposure is unknown. Ask the lawyer. The simplest fix, if needed, is to add the required details to `/legal/` and leave the rest of the site as it is.
+2. **Who is the controller and operator?** Until `entity.legalName` is set, the pages say the site is run by the founders. Fill in `entity` when the entity exists (`src/layout.mjs` → `operator()`).
+3. **Governing law and courts.** `/legal/` says they will be stated once Ace's Side is registered.
+4. **Retention.** `/privacy/` proposes keeping an email sent to the data-protection address for 12 months after the last reply. Change it to what you will actually do.
+5. **Lawful bases.** Legitimate interests for server logs; legal duty and legitimate interests for data-protection emails. Confirm.
+6. **International transfers.** Netlify (US) hosts the site. The notice says transfers rely on safeguards "such as the Standard Contractual Clauses". I saw that Netlify publishes a DPA that refers to the EU Standard Contractual Clauses, but I could not confirm its current terms or whether Netlify is certified under the EU-US Data Privacy Framework. Sign Netlify's DPA and check its sub-processor list.
+7. **Data protection officer.** The notice says none is appointed. Confirm.
 8. **Representative.** If the entity is outside the EU/UK but the site targets people there, a representative may be required.
 9. **Children.** The notice says the site is not aimed at children.
 
 ## 3. Public statements to approve
 
-Much less is public than in version 1, which also shrinks the legal exposure. What remains:
+Very little is public, which also keeps the exposure small. What remains:
 
-- **The one-line description and the taglines**, taken from the Brand Book's own Voice and messaging section.
+- **The taglines and the one-line description**, from the Brand Book's own Voice and messaging section.
+- **The six areas** (diplomacy, shared prosperity, human development, technology, the planet, inner mastery), from the approved short description. They are named, not explained, and nothing says Ace's Side does anything in them.
+- **New copy** on the home page ("One cause. Many strengths.", "How we show up", "Answer the call"). It is belief and character, and makes no claim about people, members, programs or results. The line "we reach out" is a statement of how the alliance works; make sure the founders are happy with it.
 - **"Not a government, agency, UN or intergovernmental body, regulator, emergency service or security service."** (`/legal/`.) Keep it: it protects against implying official status, which the Brand Book flags as a risk.
-- **No donations.** `/legal/` says the site takes none, and that no gift will be called tax-deductible until Ace's Side is registered to receive such gifts. The site has no donate button.
-- **No commitments about how the alliance works.** The earlier promises (every signal logged, a yearly report, how applications are handled) were removed with the pages that made them.
+- **No donations.** `/legal/` says the site takes none, and that no gift will be called tax-deductible until Ace's Side is registered to receive such gifts.
+- **Inspiration.** The site never names the source of its inspiration and uses none of its words, phrases or imagery. The Brand Book flags that the owner of those names holds trademarks on them, and that the Emblem's similarity to one of that owner's logos should be reviewed by a lawyer. The word the Brand Book says never to pair with that source ("Initiative") is not on the site.
 
 ## 4. What the site does and does not collect
 
 - No cookies, no local storage, no JavaScript, no analytics, no ads, no social widgets.
 - No request leaves acesside.com. Fonts are self-hosted (Google Fonts has had GDPR rulings against it in Germany).
 - Because nothing is stored on or read from the visitor's device, there is no cookie banner. This is the standard reading of ePrivacy Article 5(3), but I did not find national guidance to cite. If you ever add analytics or an embed, add consent first.
-- Personal data arrives only through the one contact form (and email). Netlify stores form submissions and sends notifications.
+- The site collects nothing from visitors directly. The host logs IP addresses to serve the site, and a person who emails the data-protection address sends their own email.
 - The Content-Security-Policy blocks most third-party additions by design.
 
 ## 5. Accessibility law

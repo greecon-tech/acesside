@@ -1,106 +1,77 @@
 # Handover: the Ace's Side website
 
-Version 2, 25 November 2026. Seven pages, no JavaScript, no cookies, no third-party requests. A first visit to the home page is about 75 KB.
+Version 3, 25 November 2026. Five pages, no JavaScript, no cookies, no third-party requests, no forms. A first visit to the home page is about 72 KB.
 
-## What changed in this version, and why
+## What this version does, and why
 
-The founders asked for four things:
+The founders asked for:
 
-1. **Do not publish the Doctrine.**
-2. **Share much less.** Keep most things internal and confidential.
-3. **Make the black-and-white version of the brand the main one.**
-4. **Optimise the site better for mobile.**
+1. **A little real content**, not an empty page, drawing on the inspiration the Brand Book names.
+2. **No way for visitors to contact Ace's Side.** The alliance reaches out; nobody writes in.
 
-## Public and internal
+Earlier versions: black-and-white main look, mobile-first layout, and the Doctrine and everything derived from it kept off the site.
 
-The site is a front door, not a map. It publishes only the wording the Brand Book itself wrote for public use (its "Voice and messaging" section), a contact form, and the legal pages.
+## The pages
 
-| On the public site | Kept internal (not on the site) |
-| --- | --- |
-| The tagline, the two supporting taglines | The Doctrine, in whole or in part |
-| The one-line description | The Oath, the Ten Articles, the Lines |
-| A contact form | Divisions: names, areas and work |
-| Legal notice, privacy notice, accessibility statement | The Call, membership stages, ranks, the Council, governance, the restart protocol |
-| | The Brand Book's rules and Legal protection analysis |
+| Page | Address | What it holds |
+| --- | --- | --- |
+| Home | `/` | The promise, the one-line description, "One cause. Many strengths.", the six areas, "How we show up", "Answer the call" |
+| Legal notice and terms | `/legal/` | Who runs the site, what Ace's Side is not, terms |
+| Privacy notice | `/privacy/` | What little is collected. Holds the one email address on the site |
+| Accessibility | `/accessibility/` | What was checked |
+| Not found | `/404.html` | |
 
-The word "Presence" appears only because it is in the approved one-line description.
+## The content, and where it comes from
 
-`src/content.mjs` is the only file of alliance wording the build reads. It holds three taglines and says, in a comment, not to add Doctrine content without the founders' approval.
+All of it is in `src/content.mjs` and `src/pages/home.mjs`. Three sources, and nothing else:
 
-**Enforced by the verifier.** `tools/verify.mjs` fails if any page, `robots.txt`, `sitemap.xml`, the manifest or `security.txt` contains Doctrine vocabulary (doctrine, council, the division names, oath, member, candidate and so on), or if any of the removed pages is published.
+1. **The Brand Book's own public wording:** the three taglines, the one-line description, and the six areas it names in the approved short description (diplomacy, shared prosperity, human development, technology, the planet, inner mastery). The areas are named and never explained, and the word "divisions" is not used.
+2. **New copy in the Brand Book's voice:** "Hard problems are not solved by one person, one nation or one skill…", the three "How we show up" lines (Together, Ready, Humble), and the closing "There is no form to fill in and no address to write to… we reach out."
+3. **No Doctrine content.** No structure, names, ranks, oath, articles, lines or process.
 
-### The removed pages
+**Inspiration, and how it was used.** The Brand Book says Ace's Side takes three things from the source of its inspiration: *a team of distinct specialists, one shared cause, and the readiness to answer a call*. The copy is built on those three, and only those: specialists become the six areas, the shared cause becomes the headline, the readiness becomes "Ready" and "Answer the call". **The source is never named on the site, and none of its words, phrases or imagery are used.** The Brand Book is explicit that this is private inspiration, that its owner holds trademarks on those names and phrases, and that Ace's Side leaves out spectacle, violence and superpowers. The checker enforces it: it fails the build if the name, "assemble", "heroes", "superpowers", "mightiest" or similar words appear.
 
-The Doctrine, Divisions, The Call, Membership and Accountability pages are gone from the site. Their old addresses redirect to the home page (`netlify.toml`), so old links and any search engine that saw an earlier deploy land somewhere sensible. The signal and candidacy forms are gone; there is one form, Contact.
+**What the copy does not do:** claim members, a roster, past work or results (there is none to point to yet, and "show, don't boast" is a Brand Book rule). The six areas and the lines above are statements of belief, not claims of fact.
 
-**They are not deleted from history.** The pages and their text are in git commit `e8577fd`. To bring one back:
+**Still internal:** the Doctrine and the alliance's internal structure. Removed pages are in git history, commit `e8577fd`; restore one with `git checkout e8577fd -- src/pages/doctrine.mjs`. Anyone with repository access can read that history, so keep the repository private. Cleaning the history would rewrite the repository for everyone who has a copy, so it needs the founders' decision.
 
-```bash
-git show e8577fd:src/pages/doctrine.mjs      # print it
-git checkout e8577fd -- src/pages/doctrine.mjs   # restore it
-```
+## No way to contact the alliance
 
-Anyone with access to this repository can read that history. It is private, so this is only a risk if access is shared too widely. Cleaning the history is possible, but it rewrites the repository for everyone who has a copy, so it needs a deliberate decision from the founders. See `docs/DEPLOY.md`, "If an earlier version was ever deployed", for the other places the old pages could still exist.
+Removed: the contact form, the Contact button and page, the confirmation page, `hello@` and `security@`, `security.txt`, and Netlify Forms. The old addresses (`/contact/`, `/join`, `/signal` and so on) redirect to the home page.
 
-Other things removed with the pages: the Spectral typeface (it was used only for the Doctrine), the rank marks, and the "Founding stage / Doctrine v1.0 draft" notices in the footer and home page.
+**Enforced by the checker.** `tools/verify.mjs` fails if any page contains a form, input, `tel:` or messaging link, a link to a contact page, or any email link outside the privacy notice. I proved it by injecting a form, a phone link, a contact link and an email into the built page: all five were caught.
 
-## Black and white as the main version
+**The one exception: `privacy@acesside.com`, shown only on the Privacy Notice.** It is there because data-protection law lets people exercise rights over their data (the host logs visitors' IP addresses) and requires the controller to say how. The page says it is for data-protection requests only. The Accessibility and Legal pages point to the Privacy Notice instead of repeating it. If the founders want even this gone, see `docs/LEGAL.md` section 2 first: some countries also require a way to contact the site's operator.
 
-The Brand Book approves three versions of the Emblem. The main look is now the black-and-white one, **Night: Bone on Void**:
+## Brand and design
 
-- Header, hero, closing band and footer are Void (`#050505`) with the Bone Emblem and Bone text.
-- A Bone band gives rhythm and carries the contact form and the legal text, in Void ink.
-- **Beacon amber stays the single signal:** the rule under the headline, the call-to-action button and the star in it. Stone is used only for secondary text on Void (8.3:1).
-- Favicon, app icons and the share card (the LinkedIn preview) are all the Night version. Masters for it are in `brand/` (`aces-side-night-tile.svg`, `aces-side-night-app-tile.svg`, `mark-cream.svg`). The original Stone-on-Charcoal masters are still there for other uses.
-
-**One extension to flag.** The Brand Book's approved pairings are Stone on Charcoal, Bone on Void and Charcoal on Bone. On the Bone bands I use **Void ink** rather than Charcoal, because Charcoal reads as grey and the brief is black and white. It uses only palette colors, so no new color is introduced, but it is not one of the three listed pairings. If the founders prefer Charcoal ink, it is one value in `src/css/main.css`.
+- **Main look: the black-and-white Night version, Bone on Void.** Bone bands give rhythm. Beacon amber is the only signal: the rule under the headline, and the star above "Answer the call" (the star appears once).
+- **One extension to flag:** on the Bone bands the ink is Void, not Charcoal. Not one of the Brand Book's three listed pairings, but it uses only palette colors. One value in `src/css/main.css` changes it.
+- Favicon, app icons and the share card are the Night version. `brand/` keeps the verified Emblem master and all masters.
+- Rules enforced by the checker: name spelling, banned words, at most two typefaces per page (Michroma and Inter), one Beacon star, contrast.
+- **Two Brand Book findings:** (1) Appendix A's Emblem code cannot be copied out of the PDF intact, because its line wrapping drops nine spaces; the verified master is `brand/aces-side-emblem.svg`. (2) The display typeface in both PDFs is Michroma, which is free for commercial use.
 
 ## Mobile
 
-Rebuilt mobile-first, and checked at 320, 360, 375, 390, 412 and 430 px with touch emulation:
-
-- **One-row header.** The Emblem, the name and one Contact button, instead of a navigation block that wrapped onto three lines.
-- **The promise and its button arrive together.** The hero fills the visible screen (using `svh`, so the browser's address bar does not push the button off), and the button is checked to sit above the fold on 375 × 667, 360 × 640 and 390 × 844 screens.
-- **Thumb-sized.** Buttons are full width and at least 52 px tall; every tappable item is checked to be at least 44 px.
-- **No iOS zoom on focus.** Every form field is 17 px, and the check fails below 16 px.
-- **Right keyboard.** The email field brings up the email keyboard and does not autocorrect; names get capitals.
-- **Notches and rounded corners.** `viewport-fit=cover` with safe-area padding on the header, the page edges and the footer.
-- **Pinch zoom stays allowed.** The browser theme color is Void.
-- **Smaller.** Without the removed pages and the Spectral font, the home page is lighter.
-
-## Where I changed your wording
-
-| What | Note |
-| --- | --- |
-| Everything not in the Brand Book's public messaging | Removed |
-| New copy on the site | Page leads, the form labels, the Contact page, the legal pages. Read these as drafts. |
-
-## Brand findings from the first version (still true)
-
-1. **The Emblem cannot be restored by copying Appendix A out of the PDF.** The PDF's line wrapping swallows nine spaces, and the pasted code draws a broken shape. I repaired it and checked it against the Brand Book's size and symmetry test. The verified master is `brand/aces-side-emblem.svg`. The Brand Book's Appendix A should be corrected. `node tools/make-brand-assets.mjs` regenerates every variant, the tiles, the favicons and the share card from that file.
-2. **The display typeface is Michroma**, named in the PDFs' embedded fonts, and free for commercial use. That answers the Brand Book's open typeface question.
+Built mobile-first and checked at six widths (320 to 430 px, touch, 2x): no sideways scroll, tap targets at least 44 px, safe-area padding for notched phones, pinch zoom allowed, and the Emblem, promise and description fit the first screen of common small phones. The header is a single row (the brand only).
 
 ## Engineering
 
-- **Stack:** plain HTML and CSS generated by one dependency-free Node script (`build.mjs`). No framework, no runtime JavaScript.
-- **Files:** `src/content.mjs` (the three taglines) · `src/pages/*.mjs` (one file per page) · `src/layout.mjs` (header, footer, form builder, the Emblem) · `src/css/main.css` · `brand/` · `tools/` · `public/` (the built site, committed so it can be dragged into Netlify).
-- **Commands:** `node build.mjs` builds. `npm start` previews at http://localhost:8888 with the production headers. `npm run verify` builds and runs the quality gate (needs `npm install` and `npx playwright install chromium` once).
-- **What `verify` checks (about 630 checks):** the real Content-Security-Policy is enforced with no violations; no request leaves the site; no console errors; axe-core against WCAG 2.2 A and AA on every page at desktop and phone width; six phone widths for overflow, tap-target size and input text size; the first screen on three phone sizes; every link and anchor; the form's Netlify attributes and required consent; the skip link; reduced motion; the Brand Book's name, banned-word, typeface and Beacon-star rules; and the confidentiality scan above.
-- **Security:** strict CSP (`default-src 'self'`), `frame-ancestors 'none'`, HSTS, `nosniff`, referrer and permissions policies. Hashed asset names with one-year caching. The headers also ship in `public/_headers` so a drag-and-drop deploy is just as protected.
-- **Tested in Chromium only.** Not run in Safari or Firefox, and not on real phones. Worth a manual pass, especially an iPhone, before launch.
+- **Stack:** plain HTML and CSS from one dependency-free Node script (`build.mjs`). No framework, no runtime JavaScript.
+- **Files:** `src/content.mjs` · `src/pages/*.mjs` · `src/layout.mjs` · `src/css/main.css` · `brand/` · `tools/` · `public/` (built, committed so it can be dragged into Netlify).
+- **Commands:** `node build.mjs`; `npm start` (preview with the production headers); `npm run verify` (needs `npm install` and `npx playwright install chromium` once).
+- **Verifier (about 470 checks):** the real Content-Security-Policy with no violations; no request leaves the site; no console errors; axe-core WCAG 2.2 A/AA on every page at desktop and phone width; six phone widths; the first screen; links; the name, banned-word, typeface and Beacon-star rules; the confidentiality scan; and the no-contact rule.
+- **Security:** strict CSP, `frame-ancestors 'none'`, HSTS, `nosniff`, referrer and permissions policies. Headers also ship in `public/_headers`, so dragging `public/` into Netlify is as protected as a Git deploy.
+- **Tested in Chromium only.** Not run in Safari or Firefox or on real phones. Worth a manual pass, especially an iPhone.
 
-## Technology and operations
+## Operations and legal
 
-Hosting, DNS, the form, email, the soft-launch switch and rollback are in **`docs/DEPLOY.md`**. Three things need people, not code: **create the three mailboxes**, **set the form's notification email in Netlify**, and **point DNS**.
-
-## Legal
-
-See **`docs/LEGAL.md`**. The Brand Book's own Protect checklist is still open (trademark clearance, entity registration, domain ownership, designer assignments), and the privacy notice contains a proposed retention period and transfer wording a lawyer must confirm. The site makes no claim to be registered, official or tax-exempt.
+Hosting, DNS, the one mailbox and the soft-launch switch are in **`docs/DEPLOY.md`**. The legal checklist, including the contact-details question, is **`docs/LEGAL.md`**.
 
 ## Decisions I need from the founders
 
 1. Go live now, or deploy with `SITE_INDEXING=off` until the Protect checklist is done?
-2. Who receives the contact form's notifications, and who owns `hello@`, `privacy@` and `security@`?
-3. Is the home page the right amount of information, or even less? (For example, the one-line description could be the only text.)
-4. Void ink on Bone bands (current) or Charcoal ink?
-5. Should the git history that contains the removed pages be cleaned?
+2. Who owns `privacy@acesside.com`, and is a data-protection address the right single exception?
+3. Is this the right amount of content? It can go either way: cut the six areas, or add one more short paragraph.
+4. Void ink on Bone bands (current), or Charcoal?
+5. Should the git history containing the removed pages be cleaned?

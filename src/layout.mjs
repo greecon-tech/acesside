@@ -52,9 +52,8 @@ export const heroEmblem = () => `<svg class="hero-emblem" viewBox="0 0 1024 1024
 </svg>`;
 
 // ---- Navigation ----------------------------------------------------------------------------
-// Deliberately small. The site is a front door, not a map.
+// Deliberately small. The site is a front door, not a map, and it has no way to write to the alliance.
 const FOOT = [
-  ['/contact/', 'Contact'],
   ['/legal/', 'Legal notice'],
   ['/privacy/', 'Privacy'],
   ['/accessibility/', 'Accessibility'],
@@ -72,35 +71,8 @@ export const pageHero = ({ eyebrow, title, lead }) => `<section class="band band
 ${lead ? `<p class="lead">${lead}</p>` : ''}
 </div></section>`;
 
-// Form pieces. Forms post to Netlify Forms (see netlify.toml / docs/DEPLOY.md). No JavaScript needed.
-// Mobile keyboards: email gets the email keyboard, names get capitals, and nothing autocorrects an address.
-const REQ = '<span class="req"> (required)</span>';
-function control(f, id) {
-  const hint = f.hint ? ` aria-describedby="${id}-hint"` : '';
-  const common = `id="${id}" name="${f.name}"${f.required ? ' required' : ''}${f.autocomplete ? ` autocomplete="${f.autocomplete}"` : ''}${hint}`;
-  if (f.type === 'textarea') return `<textarea ${common} rows="${f.rows || 7}" maxlength="${f.maxlength || 3000}" autocapitalize="sentences"></textarea>`;
-  if (f.type === 'select') {
-    return `<select ${common}><option value="">Choose one</option>${f.options.map((o) => `<option>${esc(o)}</option>`).join('')}</select>`;
-  }
-  const mobile = f.type === 'email' ? ' inputmode="email" autocapitalize="off" spellcheck="false" enterkeyhint="next"'
-    : f.autocomplete === 'name' ? ' autocapitalize="words" enterkeyhint="next"' : ' enterkeyhint="next"';
-  return `<input ${common} type="${f.type || 'text'}" maxlength="${f.maxlength || 200}"${mobile}>`;
-}
-export function field(form, f) {
-  const id = `${form}-${f.name}`;
-  return `<div class="field"><label for="${id}">${esc(f.label)}${f.required ? REQ : ' <span class="opt">(optional)</span>'}</label>
-${f.hint ? `<p class="hint" id="${id}-hint">${f.hint}</p>` : ''}${control(f, id)}</div>`;
-}
-export const consent = (form, purpose) => `<div class="field field--consent"><label class="choice" for="${form}-consent"><input id="${form}-consent" type="checkbox" name="consent" value="yes" required> <span>I have read the <a href="/privacy/">Privacy Notice</a> and agree that Ace’s Side may store what I send here to ${purpose}.${REQ}</span></label></div>`;
-export function form({ name, fields, purpose, submit, star = false }) {
-  return `<form class="form" name="${name}" method="POST" action="/thanks/" data-netlify="true" netlify-honeypot="bot-field">
-<input type="hidden" name="form-name" value="${name}">
-<div class="hp" aria-hidden="true"><label>Leave this field empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></div>
-${fields.map((f) => field(name, f)).join('\n')}
-${consent(name, purpose)}
-<button class="btn btn--primary" type="submit">${star ? '<svg class="btn__star" aria-hidden="true" focusable="false"><use href="#star"/></svg>' : ''}<span>${submit}</span></button>
-</form>`;
-}
+// The star on its own: the Emblem's signal. Beacon, decorative, used once per page at most.
+export const starMark = () => '<svg class="signal-star" aria-hidden="true" focusable="false"><use href="#star"/></svg>';
 
 // ---- Page shell ---------------------------------------------------------------------------------
 export function renderPage(ctx, page) {
@@ -110,7 +82,6 @@ export function renderPage(ctx, page) {
   const noindex = !indexing || page.noindex;
   const ogImage = `${config.origin}/og-image.png`;
   const ogAlt = 'The Ace’s Side Emblem beside the words “When the world needs us, we are here.”';
-  const current = (href) => (page.path === href ? ' aria-current="page"' : '');
 
   return `<!doctype html>
 <html lang="en">
@@ -145,7 +116,6 @@ ${sprite(emblem)}
 <header class="site-header">
 <div class="wrap site-header__in">
 <a class="brand" href="/"><svg class="brand__mark" aria-hidden="true" focusable="false"><use class="bold" href="#emblem"/></svg><span class="brand__name">ACE’S SIDE</span><span class="vh"> home</span></a>
-<nav class="nav" aria-label="Main"><a href="/contact/"${current('/contact/')}>Contact</a></nav>
 </div>
 </header>
 <main id="main" tabindex="-1">

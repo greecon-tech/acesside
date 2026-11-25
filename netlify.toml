@@ -44,11 +44,6 @@
   [headers.values]
     Cache-Control = "public, max-age=86400"
 
-[[headers]]
-  for = "/.well-known/security.txt"
-  [headers.values]
-    Content-Type = "text/plain; charset=utf-8"
-
 # Preview and branch deploys must never be indexed.
 [context.deploy-preview]
   [[context.deploy-preview.headers]]
@@ -125,12 +120,32 @@
 
 [[redirects]]
   from = "/join"
-  to = "/contact/"
+  to = "/"
   status = 301
 
 [[redirects]]
   from = "/signal"
-  to = "/contact/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/contact"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/contact/*"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/thanks"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/thanks/*"
+  to = "/"
   status = 301
 
 [[redirects]]
@@ -141,9 +156,4 @@
 [[redirects]]
   from = "/terms"
   to = "/legal/"
-  status = 301
-
-[[redirects]]
-  from = "/security.txt"
-  to = "/.well-known/security.txt"
   status = 301

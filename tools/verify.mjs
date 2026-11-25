@@ -60,7 +60,7 @@ const urlOf = (f) => '/' + f.slice(pub.length + 1).replace(/index\.html$/, '');
 const html = Object.fromEntries(pageFiles.map((f) => [urlOf(f), readFileSync(f, 'utf8')]));
 const text = (h) => h.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<svg[\s\S]*?<\/svg>/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&shy;/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/\s+/g, ' ');
 
-const BANNED = /\b(avengers?|marvel|assemble|armies|army|soldiers?|troops?|empire|conquest|dominion|save the world|heroes|superheroes?|destiny|awakened|the chosen|chosen (one|ones|few|people))\b/i;
+const BANNED = /\b(avengers?|marvel|assemble|armies|army|soldiers?|troops?|empire|conquest|dominion|save the world|heroes|super-?heroes?|superpowers?|mightiest|destiny|awakened|the chosen|chosen (one|ones|few|people))\b/i;
 // Founders' decision (25 Nov 2026): the Doctrine and the alliance's internal structure are not published.
 // None of this vocabulary may appear anywhere in what the site serves.
 const CONFIDENTIAL = /\b(doctrine|council|concord|prosper|ascend|ward|terra|lumen|oath|initiate|candidates?|candidacy|membership|members?|ten articles|the lines|divisions?)\b/i;
@@ -83,7 +83,7 @@ for (const [u, h] of Object.entries(html)) {
   ok(!/\sstyle="/.test(h), u, 'inline style attribute (blocked by CSP)');
   ok(!/\son[a-z]+="/.test(h), u, 'inline event handler (blocked by CSP)');
   ok(!/<script(?![^>]*application\/ld\+json)[^>]*>/.test(h), u, 'unexpected script element: the site ships no JavaScript');
-  ok((h.match(/class="btn__star"/g) || []).length <= 1, u, 'more than one Beacon star accent on a page');
+  ok((h.match(/class="(btn__star|signal-star)"/g) || []).length <= 1, u, 'more than one Beacon star accent on a page');
   ok(/<html lang="en">/.test(h), u, 'missing lang');
   ok(/<title>[^<]{3,}<\/title>/.test(h), u, 'missing title');
   ok(/<meta name="description" content="[^"]{20,}"/.test(h), u, 'missing description');
@@ -97,23 +97,24 @@ for (const [u, h] of Object.entries(html)) {
     ok(exists(path), u, `broken link ${href}`);
     if (frag && !redirects.has(path)) ok(ids[path]?.has(frag), u, `anchor #${frag} not found on ${path}`);
   }
-  // forms
-  for (const [, f] of h.matchAll(/<form\b([\s\S]*?)<\/form>/g)) {
-    const name = f.match(/name="([^"]+)"/)?.[1];
-    ok(/data-netlify="true"/.test(f) && /netlify-honeypot="bot-field"/.test(f), u, `form ${name}: missing Netlify attributes`);
-    ok(new RegExp(`name="form-name" value="${name}"`).test(f), u, `form ${name}: hidden form-name mismatch`);
-    ok(/name="consent"[^>]*required/.test(f), u, `form ${name}: consent checkbox must be required`);
-  }
+  // The alliance reaches out; nobody writes in. No channel for visitors to contact it may exist.
+  ok(!/<(form|input|textarea|select)\b/i.test(h), u, 'the site must have no form or input: there is no way to contact the alliance');
+  ok(!/data-netlify|netlify-honeypot/.test(h), u, 'Netlify Forms attribute found');
+  ok(!/href="tel:|href="sms:|href="https?:\/\/(wa\.me|t\.me|api\.whatsapp)/i.test(h), u, 'phone or messaging link found');
+  ok(!/href="\/contact/i.test(h), u, 'link to a contact page');
+  const mails = [...h.matchAll(/href="mailto:([^"?]+)/gi)].map((m) => m[1].toLowerCase());
+  if (u === '/privacy/') ok(mails.length > 0 && mails.every((m) => m.startsWith('privacy@')), u, 'the privacy notice must give only the data-protection address');
+  else ok(mails.length === 0, u, `email link outside the privacy notice: ${mails.join(', ')}`);
 }
 const hdr = existsSync(join(pub, '_headers')) ? readFileSync(join(pub, '_headers'), 'utf8') : '';
 ok(/Content-Security-Policy: default-src 'self'/.test(hdr) && /Strict-Transport-Security: max-age=/.test(hdr), 'site', '_headers is missing the CSP or HSTS (drag-and-drop deploys would be unprotected)');
 const redirectsFile = existsSync(join(pub, '_redirects')) ? readFileSync(join(pub, '_redirects'), 'utf8') : '';
-ok(/^\/doctrine\s+\/\s+301/m.test(redirectsFile) && /^\/membership\/\*\s+\/\s+301/m.test(redirectsFile), 'site', 'removed pages must redirect to the home page in _redirects');
-for (const f of ['robots.txt', 'sitemap.xml', 'site.webmanifest', '.well-known/security.txt']) {
+ok(/^\/doctrine\s+\/\s+301/m.test(redirectsFile) && /^\/membership\/\*\s+\/\s+301/m.test(redirectsFile) && /^\/contact\s+\/\s+301/m.test(redirectsFile), 'site', 'removed pages (including /contact) must redirect to the home page in _redirects');
+for (const f of ['robots.txt', 'sitemap.xml', 'site.webmanifest']) {
   const body = existsSync(join(pub, f)) ? readFileSync(join(pub, f), 'utf8') : '';
   ok(!CONFIDENTIAL.test(body), f, `confidential term in ${f}: ${body.match(CONFIDENTIAL)?.[0]}`);
 }
-for (const gone of ['doctrine', 'divisions', 'call', 'membership', 'accountability']) ok(!existsSync(join(pub, gone)), 'site', `/${gone}/ must not be published`);
+for (const gone of ['doctrine', 'divisions', 'call', 'membership', 'accountability', 'contact', 'thanks', '.well-known']) ok(!existsSync(join(pub, gone)), 'site', `/${gone}/ must not be published`);
 const titles = Object.values(html).map((h) => h.match(/<title>([^<]*)/)[1]);
 ok(new Set(titles).size === titles.length, 'site', 'duplicate <title> values');
 
@@ -167,7 +168,7 @@ for (const [label, vp] of [['desktop', { width: 1280, height: 900 }], ['phone', 
     const axe = await page.evaluate(() => window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'] } }));
     for (const v of axe.violations) fail(where, `axe ${v.id} (${v.impact}): ${v.help} → ${v.nodes.slice(0, 2).map((n) => n.target.join(' ')).join(' | ')}`);
     checks++;
-    if (shotsDir && ['/', '/doctrine/', '/call/', '/membership/', '/divisions/', '/privacy/', '/accountability/', '/contact/'].includes(u)) {
+    if (shotsDir && ['/', '/privacy/', '/legal/'].includes(u)) {
       await page.waitForTimeout(label === 'desktop' && u === '/' ? 5200 : 200); // let the hero animation finish
       await page.screenshot({ path: join(shotsDir, `${label}${u.replace(/\//g, '_') || '_'}png`.replace('_png', '.png')), fullPage: true });
     }
@@ -203,13 +204,13 @@ for (const w of MOBILE_WIDTHS) {
   }
   await context.close();
 }
-// First screen: on common small phones the promise and its button must be visible without scrolling.
+// First screen: on common small phones the Emblem, the promise and the description must be visible without scrolling.
 for (const [w, h] of [[375, 667], [360, 640], [390, 844]]) {
   const context = await browser.newContext({ viewport: { width: w, height: h }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
   const page = await context.newPage();
   await page.goto(base + '/', { waitUntil: 'networkidle' });
-  const r = await page.evaluate(() => ({ h1: document.querySelector('.hero h1').getBoundingClientRect().bottom, cta: document.querySelector('.hero .btn').getBoundingClientRect().bottom }));
-  ok(r.cta <= h, `home [first screen ${w}x${h}]`, `the button ends at ${r.cta.toFixed(0)}px, below the ${h}px fold`);
+  const r = await page.evaluate(() => ({ lead: document.querySelector('.hero .lead').getBoundingClientRect().bottom }));
+  ok(r.lead <= h, `home [first screen ${w}x${h}]`, `the promise and description end at ${r.lead.toFixed(0)}px, below the ${h}px fold`);
   await context.close();
 }
 
@@ -222,23 +223,6 @@ for (const [w, h] of [[375, 667], [360, 640], [390, 844]]) {
   ok(await page.evaluate(() => document.activeElement?.classList.contains('skip')), 'keyboard', 'first Tab stop is not the skip link');
   await page.keyboard.press('Enter');
   ok(await page.evaluate(() => document.activeElement?.id === 'main'), 'keyboard', 'skip link does not move focus to main');
-  // Form flow: a valid signal submits and lands on the confirmation page.
-  await page.goto(base + '/contact/');
-  await page.fill('#contact-name', 'Test Person');
-  await page.fill('#contact-email', 'test@example.com');
-  await page.selectOption('#contact-topic', { index: 1 });
-  await page.fill('#contact-message', 'Hello.');
-  await page.check('#contact-consent');
-  await Promise.all([page.waitForURL(/.*/), page.click('button[type=submit]')]);
-  ok(/Thank you/i.test(await page.locator('h1').innerText()), 'forms', 'contact form did not reach the confirmation page');
-  // Without consent the browser must refuse to submit.
-  await page.goto(base + '/contact/');
-  await page.fill('#contact-name', 'Test Person');
-  await page.fill('#contact-email', 'test@example.com');
-  await page.selectOption('#contact-topic', { index: 1 });
-  await page.fill('#contact-message', 'Hello.');
-  await page.click('button[type=submit]');
-  ok(await page.evaluate(() => !document.querySelector('#contact-consent').validity.valid), 'forms', 'form can be submitted without consent');
   await context.close();
 }
 

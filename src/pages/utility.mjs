@@ -1,25 +1,7 @@
 import { btn, pageHero } from '../layout.mjs';
 
-// Pages that are not part of the main journey: form confirmation and "not found".
+// Pages that are not part of the main journey: "not found".
 export default [
-  {
-    path: '/thanks/',
-    title: 'Received',
-    description: 'Your message has reached Ace’s Side.',
-    noindex: true,
-    body: () => `
-${pageHero({
-  eyebrow: 'Received',
-  title: 'Thank you',
-  lead: 'Your message has reached Ace’s Side. We use what you sent only to deal with it, as set out in the Privacy Notice.',
-})}
-<section class="band band--bone">
-<div class="wrap">
-<div class="actions">${btn('/', 'Back to the home page', 'primary')}</div>
-</div>
-</section>
-`,
-  },
   {
     path: '/404.html',
     file: '404.html',
@@ -36,7 +18,6 @@ ${pageHero({
 <div class="wrap">
 <div class="actions">
 ${btn('/', 'Go to the home page', 'primary')}
-${btn('/contact/', 'Contact us', 'ghost')}
 </div>
 </div>
 </section>

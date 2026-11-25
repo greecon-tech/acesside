@@ -72,7 +72,7 @@ for (const p of pages) {
 const origin = config.origin;
 const indexable = pages.filter((p) => !p.noindex);
 write('robots.txt', indexing
-  ? `User-agent: *\nAllow: /\nDisallow: /thanks/\n\nSitemap: ${origin}/sitemap.xml\n`
+  ? `User-agent: *\nAllow: /\n\nSitemap: ${origin}/sitemap.xml\n`
   : `# Soft launch: this site is not yet open to search engines.\nUser-agent: *\nDisallow: /\n`);
 if (indexing) {
   write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${indexable
@@ -96,10 +96,6 @@ write('site.webmanifest', JSON.stringify({
     { src: '/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
   ],
 }, null, 2) + '\n');
-// RFC 9116 security.txt. Expires is rolled forward on every deploy (about 11 months out).
-const expires = new Date(Date.now() + 330 * 86400000).toISOString();
-write('.well-known/security.txt', `Contact: mailto:${config.contact.security}\nExpires: ${expires}\nPreferred-Languages: en\nCanonical: ${origin}/.well-known/security.txt\n`);
-
 // 5. Report.
 if (problems.length) { console.error('Build problems:\n  ' + problems.join('\n  ')); process.exit(1); }
 const count = (dir) => readdirSync(dir, { withFileTypes: true }).reduce((n, e) => n + (e.isDirectory() ? count(join(dir, e.name)) : 1), 0);

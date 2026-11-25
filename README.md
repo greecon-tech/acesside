@@ -2,12 +2,12 @@
 
 The site for **acesside.com**. *When the world needs us, we are here.*
 
-Static, no JavaScript, no cookies, no third-party requests. Built from the Brand Book's public messaging, in its black-and-white (Night) version, and deployed on Netlify. It deliberately says very little: the Doctrine and the alliance's internal structure are **not** published.
+Static, no JavaScript, no cookies, no third-party requests. Built from the Brand Book's public messaging, in its black-and-white (Night) version, and deployed on Netlify. It deliberately says very little: the Doctrine and the alliance's internal structure are **not** published, and the site has **no way to contact the alliance** (it reaches out; nobody writes in).
 
 ```bash
 node build.mjs        # build into ./public
 npm start             # preview at http://localhost:8888 (with the production headers)
-npm run verify        # build, then ~630 checks: CSP, accessibility, mobile, confidentiality, brand rules
+npm run verify        # build, then ~470 checks: CSP, accessibility, mobile, confidentiality, no-contact, brand rules
 ```
 
 `npm run verify` needs `npm install` and `npx playwright install chromium` once. `node build.mjs` needs only Node 20+.
@@ -20,8 +20,8 @@ npm run verify        # build, then ~630 checks: CSP, accessibility, mobile, con
 
 ## Where things live
 
-- `src/content.mjs`: the three public taglines. Nothing else of the alliance's wording is published.
-- `src/pages/`: one file per page (home, contact, legal, privacy, accessibility). `src/layout.mjs`: header, footer, the form builder, the Emblem.
+- `src/content.mjs`: the public taglines, the six areas and three short lines. Nothing else of the alliance's wording is published.
+- `src/pages/`: one file per page (home, legal, privacy, accessibility). `src/layout.mjs`: header, footer, the Emblem.
 - `src/css/main.css`: all styling, mobile-first, Bone on Void.
 - `site.config.json`: name, addresses, legal entity (blank until it exists).
 - `brand/aces-side-emblem.svg`: the verified master of the Emblem. Everything else is generated from it: `node tools/make-brand-assets.mjs`.
