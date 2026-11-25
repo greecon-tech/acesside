@@ -61,9 +61,9 @@ const html = Object.fromEntries(pageFiles.map((f) => [urlOf(f), readFileSync(f, 
 const text = (h) => h.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<svg[\s\S]*?<\/svg>/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&shy;/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/\s+/g, ' ');
 
 const BANNED = /\b(avengers?|marvel|assemble|armies|army|soldiers?|troops?|empire|conquest|dominion|save the world|heroes|super-?heroes?|superpowers?|mightiest|destiny|awakened|the chosen|chosen (one|ones|few|people))\b/i;
-// Founders' decision (25 Nov 2026): the Doctrine and the alliance's internal structure are not published.
-// None of this vocabulary may appear anywhere in what the site serves.
-const CONFIDENTIAL = /\b(doctrine|council|concord|prosper|ascend|ward|terra|lumen|oath|initiate|candidates?|candidacy|membership|members?|ten articles|the lines|divisions?)\b/i;
+// Founders' decision (25 Nov 2026): the Doctrine is not published. There is no /doctrine/ page, no link to
+// one, and the word does not appear anywhere the site serves. Everything else on the site is public.
+const CONFIDENTIAL = /\bdoctrines?\b/i;
 const MISSPELLED = /\bAces Side\b|\bAce Side\b|\bAces[’'] Side\b|AcesSide|\bAce's Side\b/;
 const ids = {};
 for (const [u, h] of Object.entries(html)) ids[u] = new Set([...h.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
@@ -74,8 +74,8 @@ for (const [u, h] of Object.entries(html)) {
   const t = text(h);
   ok(!BANNED.test(t), u, `banned word in copy: ${t.match(BANNED)?.[0]}`);
   ok(!BANNED.test(h), u, `banned word in markup: ${h.match(BANNED)?.[0]}`);
-  ok(!CONFIDENTIAL.test(t), u, `confidential term in copy: ${t.match(CONFIDENTIAL)?.[0]}`);
-  ok(!CONFIDENTIAL.test(h), u, `confidential term in markup: ${h.match(CONFIDENTIAL)?.[0]}`);
+  ok(!CONFIDENTIAL.test(t), u, `the Doctrine must not be mentioned: ${t.match(CONFIDENTIAL)?.[0]}`);
+  ok(!CONFIDENTIAL.test(h), u, `the Doctrine must not be mentioned: ${h.match(CONFIDENTIAL)?.[0]}`);
   ok(!/user-scalable\s*=\s*no|maximum-scale/.test(h), u, 'viewport must allow pinch zoom');
   ok(/viewport-fit=cover/.test(h), u, 'viewport-fit=cover missing (notched phones)');
   ok(!MISSPELLED.test(t), u, `name misspelled: ${t.match(MISSPELLED)?.[0]}`);
@@ -109,12 +109,12 @@ for (const [u, h] of Object.entries(html)) {
 const hdr = existsSync(join(pub, '_headers')) ? readFileSync(join(pub, '_headers'), 'utf8') : '';
 ok(/Content-Security-Policy: default-src 'self'/.test(hdr) && /Strict-Transport-Security: max-age=/.test(hdr), 'site', '_headers is missing the CSP or HSTS (drag-and-drop deploys would be unprotected)');
 const redirectsFile = existsSync(join(pub, '_redirects')) ? readFileSync(join(pub, '_redirects'), 'utf8') : '';
-ok(/^\/doctrine\s+\/\s+301/m.test(redirectsFile) && /^\/membership\/\*\s+\/\s+301/m.test(redirectsFile) && /^\/contact\s+\/\s+301/m.test(redirectsFile), 'site', 'removed pages (including /contact) must redirect to the home page in _redirects');
+ok(/^\/doctrine\s+\/\s+301/m.test(redirectsFile) && /^\/doctrine\/\*\s+\/\s+301/m.test(redirectsFile) && /^\/contact\s+\/\s+301/m.test(redirectsFile), 'site', '/doctrine and /contact must redirect to the home page in _redirects');
 for (const f of ['robots.txt', 'sitemap.xml', 'site.webmanifest']) {
   const body = existsSync(join(pub, f)) ? readFileSync(join(pub, f), 'utf8') : '';
   ok(!CONFIDENTIAL.test(body), f, `confidential term in ${f}: ${body.match(CONFIDENTIAL)?.[0]}`);
 }
-for (const gone of ['doctrine', 'divisions', 'call', 'membership', 'accountability', 'contact', 'thanks', '.well-known']) ok(!existsSync(join(pub, gone)), 'site', `/${gone}/ must not be published`);
+for (const gone of ['doctrine', 'contact', 'thanks', '.well-known']) ok(!existsSync(join(pub, gone)), 'site', `/${gone}/ must not be published`);
 const titles = Object.values(html).map((h) => h.match(/<title>([^<]*)/)[1]);
 ok(new Set(titles).size === titles.length, 'site', 'duplicate <title> values');
 
@@ -212,6 +212,45 @@ for (const [w, h] of [[375, 667], [360, 640], [390, 844]]) {
   const r = await page.evaluate(() => ({ lead: document.querySelector('.hero .lead').getBoundingClientRect().bottom }));
   ok(r.lead <= h, `home [first screen ${w}x${h}]`, `the promise and description end at ${r.lead.toFixed(0)}px, below the ${h}px fold`);
   await context.close();
+}
+
+// ---- Navigation menu: a native <details> disclosure (no JavaScript) --------------------------------
+{
+  const links = (page) => page.locator('.menu li a');
+  const visible = async (page) => Promise.all([0, 1, 2, 3].map((i) => links(page).nth(i).isVisible()));
+  // Phone: closed by default behind a Menu button; opens on tap; each link is a big tap target.
+  const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+  const mp = await phone.newPage();
+  await mp.goto(base + '/', { waitUntil: 'networkidle' });
+  ok(await mp.locator('.menu summary').isVisible(), 'menu [phone]', 'the Menu button must be visible on a phone');
+  ok((await visible(mp)).every((v) => !v), 'menu [phone]', 'the links must be hidden until the Menu is opened');
+  await mp.tap('.menu summary');
+  ok((await visible(mp)).every(Boolean), 'menu [phone]', 'tapping Menu must show all four links');
+  const heights = await links(mp).evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height));
+  ok(heights.every((h) => h >= 44), 'menu [phone]', `menu links are under 44px tall: ${heights.join(', ')}`);
+  ok(await mp.locator('.site-header').evaluate((h) => h.getBoundingClientRect().height <= 70), 'menu [phone]', 'the closed header must be a single row');
+  await mp.tap('.menu a[href="/divisions/"]');
+  await mp.waitForURL(/\/divisions\/$/);
+  ok((await mp.locator('h1').innerText()).length > 0, 'menu [phone]', 'a menu link did not open its page');
+  await phone.close();
+  // Desktop: the links sit in the header row, with no Menu button.
+  const desk = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const dp = await desk.newPage();
+  await dp.goto(base + '/', { waitUntil: 'networkidle' });
+  ok(!(await dp.locator('.menu summary').isVisible()), 'menu [desktop]', 'no Menu button on a wide screen');
+  ok((await visible(dp)).every(Boolean), 'menu [desktop]', 'all four links must show in the header row');
+  await desk.close();
+  // Keyboard: Tab reaches the Menu button, Enter opens it, Tab then reaches the first link.
+  const kb = await browser.newContext({ viewport: { width: 700, height: 700 } });
+  const kp = await kb.newPage();
+  await kp.goto(base + '/', { waitUntil: 'networkidle' });
+  for (let i = 0; i < 3; i++) await kp.keyboard.press('Tab');
+  ok(await kp.evaluate(() => document.activeElement?.tagName === 'SUMMARY'), 'menu [keyboard]', 'the Menu button is not the third Tab stop (skip link, brand, menu)');
+  await kp.keyboard.press('Enter');
+  ok(await kp.evaluate(() => document.querySelector('.menu').open), 'menu [keyboard]', 'Enter must open the menu');
+  await kp.keyboard.press('Tab');
+  ok(await kp.evaluate(() => document.activeElement?.textContent.trim() === 'Divisions'), 'menu [keyboard]', 'Tab after opening must reach the first link');
+  await kb.close();
 }
 
 // Keyboard: the first Tab stop on every page must be the skip link, and Enter must move focus to <main>.

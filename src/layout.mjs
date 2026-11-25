@@ -52,12 +52,32 @@ export const heroEmblem = () => `<svg class="hero-emblem" viewBox="0 0 1024 1024
 </svg>`;
 
 // ---- Navigation ----------------------------------------------------------------------------
-// Deliberately small. The site is a front door, not a map, and it has no way to write to the alliance.
-const FOOT = [
+// No Doctrine page and no contact page: the Doctrine is not published, and the alliance reaches out.
+const NAV = [
+  ['/divisions/', 'Divisions'],
+  ['/call/', 'The Call'],
+  ['/membership/', 'Membership'],
+  ['/accountability/', 'Accountability'],
+];
+const FOOT_SITE = [
   ['/legal/', 'Legal notice'],
   ['/privacy/', 'Privacy'],
   ['/accessibility/', 'Accessibility'],
 ];
+
+// Rank marks from the Brand Book: Initiate = outline star (Stone), Member = solid star (Stone),
+// Ace = solid star (Beacon), Council = Beacon star inside a closed ring.
+export function rankMark(kind) {
+  const label = { initiate: 'Initiate mark: outline star', member: 'Member mark: solid star', ace: 'Ace mark: solid Beacon star', council: 'Council mark: Beacon star inside a closed ring' }[kind];
+  const star = (cls, x, y, w, h) => `<use class="${cls}" href="#star" x="${x}" y="${y}" width="${w}" height="${h}"/>`;
+  const inner = {
+    initiate: star('rank rank--outline', 102, 102, 435, 195),
+    member: star('rank rank--stone', 102, 102, 435, 195),
+    ace: star('rank rank--beacon', 102, 102, 435, 195),
+    council: `<circle class="rank-ring" cx="320" cy="200" r="190"/>${star('rank rank--beacon', 167, 131, 305, 137)}`,
+  }[kind];
+  return `<svg class="rank-mark" viewBox="0 0 640 400" role="img" aria-label="${label}">${inner}</svg>`;
+}
 
 // ---- Small builders ---------------------------------------------------------------------------
 export const btn = (href, label, kind = 'primary', { star = false } = {}) =>
@@ -80,6 +100,7 @@ export function renderPage(ctx, page) {
   const url = config.origin + page.path;
   const title = page.path === '/' ? page.title : `${page.title} · ${config.name}`;
   const noindex = !indexing || page.noindex;
+  const current = (href) => (page.path === href ? ' aria-current="page"' : '');
   const ogImage = `${config.origin}/og-image.png`;
   const ogAlt = 'The Ace’s Side Emblem beside the words “When the world needs us, we are here.”';
 
@@ -116,6 +137,12 @@ ${sprite(emblem)}
 <header class="site-header">
 <div class="wrap site-header__in">
 <a class="brand" href="/"><svg class="brand__mark" aria-hidden="true" focusable="false"><use class="bold" href="#emblem"/></svg><span class="brand__name">ACE’S SIDE</span><span class="vh"> home</span></a>
+<details class="menu">
+<summary><span class="menu__open">Menu</span><span class="menu__close">Close</span></summary>
+<nav aria-label="Main"><ul>
+${NAV.map(([href, label]) => `<li><a href="${href}"${current(href)}>${label}</a></li>`).join('\n')}
+</ul></nav>
+</details>
 </div>
 </header>
 <main id="main" tabindex="-1">
@@ -128,9 +155,14 @@ ${page.body}
 <a class="brand" href="/"><svg class="brand__mark" aria-hidden="true" focusable="false"><use class="bold" href="#emblem"/></svg><span class="brand__name">ACE’S SIDE</span><span class="vh"> home</span></a>
 <p class="footer__tag">${esc(config.tagline)}</p>
 </div>
-<nav aria-label="Site"><ul>
-${FOOT.map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('\n')}
+<div class="footer__nav">
+<nav aria-label="Alliance"><h2 class="footer__h">Alliance</h2><ul>
+${NAV.map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('\n')}
 </ul></nav>
+<nav aria-label="Site"><h2 class="footer__h">Site</h2><ul>
+${FOOT_SITE.map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('\n')}
+</ul></nav>
+</div>
 </div>
 <div class="footer__base"><p>© 2026 Ace’s Side. This site sets no cookies and runs no tracking.</p></div>
 </div>

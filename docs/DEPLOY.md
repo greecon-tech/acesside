@@ -44,7 +44,7 @@ The site has no form and no way to write to the alliance, by design. There is no
 
 ## If an earlier version was ever deployed
 
-Earlier versions of the site contained the Doctrine (commit `e8577fd`) and then a contact form. If you deployed either anywhere, redeploying this version removes those pages from the live address, and the old addresses now redirect to the home page. Three places can still hold the old pages:
+The first version of the site (commit `e8577fd`) contained the Doctrine page and three forms. If you deployed it anywhere, redeploying this version removes the Doctrine page and the forms from the live address, and `/doctrine/` and `/contact/` now redirect to the home page. Three places can still hold the old pages:
 
 - **Old Netlify deploys.** Every deploy keeps its own permanent address (`<id>--<site>.netlify.app`) that still serves that version. In Netlify → **Deploys**, open the old deploys and delete them. Then check that only the current deploy remains.
 - **Search engines and caches.** If the site was indexed, use Google Search Console's **Removals** tool ("Remove outdated content") for the old addresses; Bing has an equivalent. The redirects help once crawlers revisit.

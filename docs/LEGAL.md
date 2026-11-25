@@ -14,7 +14,7 @@ The website is step 3 of the Brand Book's Rollout. Step 1, Protect, is still ope
 | File trademark applications | Open | The site uses no ™ or ® symbol. Do not add ® before registration. |
 | Confirm ownership of acesside.com, secure handles | Open | I could not look the domain up from here. |
 | Signed rights assignments from every designer | Open | Includes the Emblem and anything made with AI image tools. |
-| Division names cleared | Does not block the site | The names are **not** on the public site. They still need clearance before any public use. |
+| Division names cleared (Concord, Prosper, Ascend, Ward, Terra, Lumen) | Open | They are on the public site (home, Divisions, Doctrine-derived pages). The Brand Book says they need the same clearance as the name before public use. |
 
 Use `SITE_INDEXING=off` (see `DEPLOY.md`) if you want to deploy before these are done.
 
@@ -40,13 +40,16 @@ Each is one edit in `site.config.json` or one line in the named file.
 
 ## 3. Public statements to approve
 
-Very little is public, which also keeps the exposure small. What remains:
+Everything below is on the public site, so a lawyer should read it.
 
 - **The taglines and the one-line description**, from the Brand Book's own Voice and messaging section.
-- **The six areas** (diplomacy, shared prosperity, human development, technology, the planet, inner mastery), from the approved short description. They are named, not explained, and nothing says Ace's Side does anything in them.
-- **New copy** on the home page ("One cause. Many strengths.", "How we show up", "Answer the call"). It is belief and character, and makes no claim about people, members, programs or results. The line "we reach out" is a statement of how the alliance works; make sure the founders are happy with it.
-- **"Not a government, agency, UN or intergovernmental body, regulator, emergency service or security service."** (`/legal/`.) Keep it: it protects against implying official status, which the Brand Book flags as a risk.
+- **"Advises nations", "supports communities", "helps shape global systems"** and the division descriptions. The Brand Book warns that wording like "guiding nations" can imply official power. I did not use that wording, but the pages describe mediation, advising governments and similar work.
+- **Ward.** The Doctrine says "secure digital and SCADA systems, defense against harmful autonomous systems". The Brand Book says to check licensing before offering any security service. The site says "secure digital and control systems, and safeguards against harmful autonomous systems". Confirm, or revert in `src/content.mjs`.
+- **The Lines**, including "No action without standing" and "No false authority", are public commitments. So are the Articles and the Oath.
+- **Commitments in the copy** that the founders must be able to keep: every signal is logged; a yearly report on missions, funding and mistakes (the first "will follow our first full year of work"); every candidate is checked for conflicts of interest; mistakes are reported, never hidden; "we reach out."
+- **"Not a government, agency, UN or intergovernmental body, regulator, emergency service or security service."** (`/legal/`.) Keep it.
 - **No donations.** `/legal/` says the site takes none, and that no gift will be called tax-deductible until Ace's Side is registered to receive such gifts.
+- **Emergencies.** The Call page tells people to contact local emergency services first and says Ace's Side is not an emergency service.
 - **Inspiration.** The site never names the source of its inspiration and uses none of its words, phrases or imagery. The Brand Book flags that the owner of those names holds trademarks on them, and that the Emblem's similarity to one of that owner's logos should be reviewed by a lawyer. The word the Brand Book says never to pair with that source ("Initiative") is not on the site.
 
 ## 4. What the site does and does not collect
@@ -68,8 +71,8 @@ The EU Accessibility Act (applying since 28 June 2025) covers certain consumer s
 
 ## 7. Confidentiality
 
-The Doctrine and the internal structure of the alliance are deliberately not on the website (see `HANDOVER.md`). Three things to remember:
+The Doctrine as a document is deliberately not on the website, though much of its substance is on the other pages (see `HANDOVER.md` for the exact line). Three things to remember:
 
-- **Git history.** The removed pages are still in this repository's history (commit `e8577fd`). Keep the repository private, and tell me if you want the history cleaned.
+- **Git history.** The Doctrine page is still in this repository's history (commit `e8577fd`). Keep the repository private, and tell me if you want the history cleaned.
 - **The Brand Book's banned words.** `tools/verify.mjs` lists them, including the two it says to keep as private inspiration. Nothing in the published site mentions them, but a public repository would show the list.
 - **If an earlier version went live.** See `DEPLOY.md`.

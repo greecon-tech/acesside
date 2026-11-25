@@ -70,22 +70,52 @@ main:focus{outline:none}
 .prose ul{padding-left:1.25rem}
 .prose li+li{margin-top:.5em}
 
-/* ---- header / footer ---- */
+/* ---- header / menu / footer ---- */
 .site-header{background:var(--void);border-bottom:1px solid var(--line-dark);padding-top:var(--safe-t)}
-.site-header__in{display:flex;align-items:center;justify-content:flex-start;gap:1rem;min-height:var(--header-h)}
+.site-header__in{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:var(--header-h)}
 .brand{display:inline-flex;align-items:center;gap:.75rem;text-decoration:none;color:var(--bone);min-height:2.75rem}
 .brand__mark{width:2.25rem;height:2.25rem;fill:var(--bone);color:var(--bone);flex:none}
 .brand__name{font:400 .95rem/1 var(--display);letter-spacing:.12em}
+/* Navigation is a native <details> disclosure: a Menu button on phones, a row of links on wide screens.
+   No JavaScript. */
+.menu{position:relative}
+.menu summary{list-style:none;display:inline-flex;align-items:center;min-height:2.75rem;padding:.4rem 1rem;border:1px solid var(--line-dark);cursor:pointer;font:400 .72rem/1.2 var(--display);letter-spacing:.14em;text-transform:uppercase;user-select:none}
+.menu summary::-webkit-details-marker{display:none}
+.menu summary:hover,.menu[open] summary{background:var(--bone);color:var(--void);border-color:var(--bone)}
+.menu__close{display:none}
+.menu[open] .menu__open{display:none}
+.menu[open] .menu__close{display:inline}
+.menu nav{position:absolute;right:0;top:calc(100% + .5rem);z-index:30;width:min(18rem,calc(100vw - var(--gutter) - var(--gutter)));background:var(--void);border:1px solid var(--bone)}
+.menu ul{list-style:none}
+.menu li+li{border-top:1px solid var(--line-dark)}
+.menu li a{display:flex;align-items:center;min-height:3.25rem;padding:0 1.25rem;font:400 .8rem/1.2 var(--display);letter-spacing:.14em;text-transform:uppercase;text-decoration:none}
+.menu li a:hover{background:var(--bone);color:var(--void)}
+.menu li a[aria-current="page"]{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.5em}
+/* Wide screens: the links sit in the header row. Only where the browser can show the closed content;
+   older browsers keep the working dropdown. */
+@media (min-width:56rem){
+  @supports selector(details::details-content){
+    .menu summary{display:none}
+    .menu::details-content{content-visibility:visible;display:block}
+    .menu nav{position:static;width:auto;background:none;border:0}
+    .menu ul{display:flex;gap:.25rem 1.75rem}
+    .menu li+li{border-top:0}
+    .menu li a{min-height:2.75rem;padding:0 .25rem;font-size:.72rem}
+    .menu li a:hover{background:none;color:inherit;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.5em}
+  }
+}
 .site-footer{background:var(--void);color:var(--stone);border-top:1px solid var(--line-dark);padding-top:2.5rem;--focus:var(--beacon)}
 .site-footer a{color:var(--bone)}
-.footer__top{display:grid;gap:1.75rem}
+.footer__top{display:grid;gap:2rem}
 .footer__tag{margin-top:.5rem;font-size:.9375rem}
-.site-footer ul{list-style:none;display:grid}
+.footer__nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem}
+.footer__h{font:400 .72rem/1.2 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--bone);margin-bottom:.35rem}
+.site-footer ul{list-style:none}
 .site-footer li a{display:inline-flex;align-items:center;min-height:2.75rem;font-size:.9375rem}
 .footer__base{margin-top:1.5rem;padding-block:1.25rem calc(1.75rem + var(--safe-b));border-top:1px solid var(--line-dark);font-size:.875rem}
-@media (min-width:40rem){
-  .footer__top{grid-template-columns:1fr auto;align-items:start}
-  .site-footer ul{display:flex;gap:1.75rem}
+@media (min-width:48rem){
+  .footer__top{grid-template-columns:1fr 1.3fr;align-items:start}
+  .footer__nav{gap:3rem}
 }
 
 /* ---- buttons: full-width and thumb-sized on phones ---- */
@@ -135,22 +165,79 @@ main:focus{outline:none}
 .statement{font-size:clamp(1.4rem,.9rem + 3.6vw,3.2rem);line-height:1.3}
 .statement-note{margin-top:1.5rem;max-width:30rem}
 
-/* ---- home: who we are, how we show up ---- */
+/* ---- content blocks (home and inner pages). Mobile-first: one column, then two, then more. ---- */
 .h2--big{font-size:clamp(1.4rem,.9rem + 3.4vw,3rem);line-height:1.3;margin-bottom:1.5rem}
 .band--void .h2--big{margin-bottom:1.25rem}
 .lead-prose{font-size:clamp(1.125rem,1.02rem + .5vw,1.3rem);line-height:1.6}
 .lead-prose p+p{margin-top:.9em}
-/* The six areas: named, never explained. Two across on a phone, three on a tablet, six in a row on a wide screen. */
-.areas{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 1.25rem;margin-top:2.25rem;border-top:1px solid var(--line-light)}
-.areas li{padding-block:1rem;border-bottom:1px solid var(--line-light);font-weight:600;line-height:1.35;overflow-wrap:break-word}
-@media (min-width:40rem){.areas{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (min-width:64rem){.areas{grid-template-columns:repeat(6,minmax(0,1fr));border-bottom:1px solid var(--line-light)}.areas li{border-bottom:0}}
-.ways{list-style:none;display:grid;gap:0;margin-top:.5rem}
-.ways li{display:grid;gap:.35rem 2rem;padding-block:1.4rem;border-top:1px solid var(--line-dark)}
-.ways h3{font:400 .9rem/1.4 var(--display);letter-spacing:.14em;text-transform:uppercase}
-.ways p{color:var(--stone);max-width:34rem}
-@media (min-width:48rem){.ways li{grid-template-columns:12rem minmax(0,1fr);align-items:baseline}}
-.closing{margin-top:clamp(2.5rem,7vw,5rem);padding-top:clamp(2.25rem,6vw,4rem);border-top:1px solid var(--line-dark)}
+.band--void .h2{margin-bottom:1.1rem}
+.band--bone .h2{margin-bottom:1.1rem}
+.split{display:grid;gap:2.25rem}
+@media (min-width:56rem){.split{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4rem}.split--wide-left{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.75rem 1.25rem;align-content:start}
+.fact dt{font:400 clamp(1.75rem,1.2rem + 2vw,2.5rem)/1 var(--display)}
+.fact dd{margin-top:.5rem;font-size:.9375rem}
+@media (min-width:40rem) and (max-width:55.99rem){.facts{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.presence{list-style:none;display:grid;margin-top:2rem;border-top:1px solid var(--line-dark)}
+.presence li{display:grid;gap:.4rem 2rem;padding-block:1.15rem;border-bottom:1px solid var(--line-dark)}
+.presence strong{font:400 .8rem/1.4 var(--display);letter-spacing:.14em;text-transform:uppercase}
+@media (min-width:48rem){.presence li{grid-template-columns:14rem minmax(0,1fr);align-items:baseline}}
+.pull{margin-top:2.25rem;max-width:36rem;padding-left:1.25rem;border-left:3px solid var(--stone);font-size:clamp(1.125rem,1rem + .6vw,1.4rem);line-height:1.5}
+.pull strong{display:block;font:400 .72rem/1.4 var(--display);letter-spacing:.16em;text-transform:uppercase;margin-bottom:.75rem;color:var(--stone)}
+/* division cards */
+.cards{display:grid;grid-template-columns:1fr;gap:1px;margin-top:2rem;background:var(--line-light);border:1px solid var(--line-light)}
+@media (min-width:36rem){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:64rem){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.card{padding:1.5rem;background:var(--bone);display:flex;flex-direction:column;gap:.55rem}
+.card__code{font:400 .72rem/1 var(--display);letter-spacing:.16em}
+.card h3{font:400 1.15rem/1.3 var(--display);letter-spacing:.12em;text-transform:uppercase;font-synthesis:none}
+.card__area{font-weight:600}
+.card dl{display:grid;gap:.75rem;margin-top:.5rem}
+.card dt{font:400 .68rem/1.3 var(--display);letter-spacing:.14em;text-transform:uppercase;margin-bottom:.15rem}
+/* the Call: numbered steps */
+.steps{list-style:none;counter-reset:step;display:grid;grid-template-columns:1fr;gap:1.75rem 2rem;margin-top:2rem}
+@media (min-width:36rem){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:64rem){.steps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.steps li{counter-increment:step;padding-top:1.1rem;border-top:1px solid var(--line-dark)}
+.band--bone .steps li{border-top-color:var(--line-light)}
+.steps li::before{content:counter(step,decimal-leading-zero);display:block;font:400 1.5rem/1 var(--display);color:var(--stone);margin-bottom:.8rem}
+.band--bone .steps li::before{color:var(--void)}
+.steps h3{font:400 .85rem/1.4 var(--display);letter-spacing:.14em;text-transform:uppercase;margin-bottom:.5rem}
+.steps.steps--long{grid-template-columns:1fr;max-width:46rem}
+.steps+p,.steps+.measure{margin-top:2.5rem}
+/* the Lines and Articles */
+.lines{list-style:none;display:grid;grid-template-columns:1fr;gap:0 2rem;margin-top:2rem}
+@media (min-width:36rem){.lines{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:64rem){.lines{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.lines li{padding-block:1rem;border-top:1px solid var(--line-light);font-weight:600}
+.band--void .lines li{border-top-color:var(--line-dark)}
+.lines li span{display:block;font-weight:400;font-size:.9375rem;margin-top:.25rem}
+.numbered{list-style:none;counter-reset:n;display:grid;margin-top:1.75rem;max-width:46rem}
+.numbered li{counter-increment:n;display:grid;grid-template-columns:2.5rem minmax(0,1fr);gap:.75rem;padding-block:1.1rem;border-top:1px solid var(--line-light)}
+.numbered li::before{content:counter(n);font:400 1.1rem/1.5 var(--display)}
+.numbered strong{display:block}
+.pairs{list-style:none;display:grid;margin-top:1.75rem;max-width:46rem}
+.pairs li{padding-block:1.1rem;border-top:1px solid var(--line-light)}
+.band--void .pairs li{border-top-color:var(--line-dark)}
+.pairs strong{display:block}
+/* membership: stages with rank marks, and the Oath */
+.stage-list{list-style:none;display:grid;margin-top:2rem;border-top:1px solid var(--line-dark)}
+.stage-list li{display:grid;gap:.5rem 2rem;padding-block:1.4rem;border-bottom:1px solid var(--line-dark);align-items:center}
+.stage-list h3{font:400 .9rem/1.4 var(--display);letter-spacing:.14em;text-transform:uppercase;margin-bottom:.15rem}
+.stage__mark{width:7rem;min-height:3.25rem;display:flex;align-items:center}
+.rank-mark{width:6rem;height:auto;max-height:3.75rem}
+.rank{fill:var(--stone)}
+.rank--outline{fill:none;stroke:var(--stone);stroke-width:7;stroke-linejoin:round}
+.rank--beacon{fill:var(--beacon)}
+.rank-ring{fill:none;stroke:var(--stone);stroke-width:9}
+@media (min-width:48rem){.stage-list li{grid-template-columns:8rem 11rem minmax(0,1fr)}}
+.oath{margin-top:2.25rem;max-width:34rem;border-left:3px solid var(--stone);padding-left:1.25rem;font-size:clamp(1.15rem,1rem + .5vw,1.4rem);line-height:1.5;font-style:italic}
+.oath p+p{margin-top:1.1rem}
+.oath p:last-child{font-style:normal;font-weight:600}
+.notice{max-width:40rem;padding:1.15rem 1.35rem;border:2px solid var(--void);margin-top:2rem}
+.notice strong{display:block;font:400 .75rem/1.4 var(--display);letter-spacing:.14em;text-transform:uppercase;margin-bottom:.5rem}
+/* the closing line, with the star as the one Beacon accent on the page */
+.closing--solo{padding-block:0}
 .signal-star{width:4.5rem;height:2rem;fill:var(--beacon);margin-bottom:1.5rem}
 
 /* ---- legal pages ---- */

@@ -1,8 +1,8 @@
-import { esc, heroEmblem, starMark } from '../layout.mjs';
-import { areas, ways } from '../content.mjs';
+import { esc, btn, heroEmblem, starMark } from '../layout.mjs';
+import { divisions, presence, presenceQuestion, callSteps, lines } from '../content.mjs';
 
-// A little content, in the Brand Book's voice. The site gives no way to contact the alliance:
-// Ace's Side reaches out; nobody writes in.
+// The home page. The Doctrine is not published (no page, no link, no mention).
+// The site gives no way to contact the alliance: Ace's Side reaches out; nobody writes in.
 export default {
   path: '/',
   title: 'Ace’s Side · When the world needs us, we are here',
@@ -31,31 +31,82 @@ export default {
 </section>
 
 <section class="band band--bone" aria-labelledby="who">
-<div class="wrap">
+<div class="wrap split split--wide-left">
+<div>
 <p class="eyebrow">Who we are</p>
 <h2 class="display h2 h2--big" id="who">One cause.<br>Many strengths.</h2>
 <div class="prose lead-prose">
 <p>Hard problems are not solved by one person, one nation or one skill. They are met by people who are each excellent at something different, and who share one cause.</p>
 <p>That is what Ace’s Side is built on.</p>
 </div>
-<ul class="areas" aria-label="Where we work">
-${areas.map((a) => `<li>${esc(a)}</li>`).join('\n')}
-</ul>
+</div>
+<dl class="facts">
+<div class="fact"><dt>6</dt><dd>Divisions, each covering one area of the founding text</dd></div>
+<div class="fact"><dt>10</dt><dd>Articles that govern everything we do</dd></div>
+<div class="fact"><dt>8</dt><dd>Lines we never cross, for any reason</dd></div>
+<div class="fact"><dt>1</dt><dd>Oath, renewed by every member each year</dd></div>
+</dl>
 </div>
 </section>
 
-<section class="band band--void" aria-labelledby="ways">
+<section class="band band--void" aria-labelledby="presence">
 <div class="wrap">
-<p class="eyebrow">How we show up</p>
-<h2 class="vh" id="ways">How we show up</h2>
-<ul class="ways">
-${ways.map((w) => `<li><h3>${esc(w.name)}</h3><p>${esc(w.text)}</p></li>`).join('\n')}
+<p class="eyebrow">The principle</p>
+<h2 class="display h2" id="presence">Presence</h2>
+<p class="lead">Presence is full awareness, responsibility and empowerment, held at the same time. Every leader and every member of Ace’s Side must embody it.</p>
+<ul class="presence">
+${presence.map((p) => `<li><strong>${esc(p.name)}</strong><span>${esc(p.text)}</span></li>`).join('\n')}
 </ul>
-<div class="closing">
-${starMark()}
-<h2 class="display h2 h2--big">Answer the call</h2>
-<p class="lead">There is no form to fill in and no address to write to. When there is a place for you, or a need we can meet together, we reach out.</p>
+<p class="pull"><strong>Before any decision</strong>${esc(presenceQuestion)}</p>
 </div>
+</section>
+
+<section class="band band--bone" aria-labelledby="divisions">
+<div class="wrap">
+<p class="eyebrow">How we are organized</p>
+<h2 class="display h2" id="divisions">Six divisions</h2>
+<p class="lead">Like a team of specialists, each division has its own strength. The strongest missions draw on several at once.</p>
+<div class="cards">
+${divisions.map((d) => `<article class="card">
+<span class="card__code">${d.code}</span>
+<h3>${esc(d.name)}</h3>
+<p class="card__area">${esc(d.area)}</p>
+<p>${esc(d.protects)}</p>
+</article>`).join('\n')}
+</div>
+<div class="actions">${btn('/divisions/', 'See each division', 'ghost')}</div>
+</div>
+</section>
+
+<section class="band band--void" aria-labelledby="call">
+<div class="wrap">
+<p class="eyebrow">How we answer</p>
+<h2 class="display h2" id="call">The Call</h2>
+<p class="lead">When the world needs Ace’s Side, the response follows six steps, in order, every time. A call is declined if it fails the assessment. Saying no to the wrong mission protects the right ones.</p>
+<ol class="steps">
+${callSteps.map((s) => `<li><h3>${esc(s.name)}</h3><p>${esc(s.short)}</p></li>`).join('\n')}
+</ol>
+<div class="actions">${btn('/call/', 'How the Call works', 'ghost')}</div>
+</div>
+</section>
+
+<section class="band band--bone" aria-labelledby="lines">
+<div class="wrap">
+<p class="eyebrow">Held to account</p>
+<h2 class="display h2" id="lines">Eight Lines</h2>
+<p class="lead">These lines are never crossed, by any member, for any reason. Crossing one ends membership.</p>
+<ul class="lines">
+${lines.map((l) => `<li>${esc(l.title)}</li>`).join('\n')}
+</ul>
+<div class="actions">${btn('/accountability/', 'How we are held to account', 'ghost')}</div>
+</div>
+</section>
+
+<section class="band band--void" aria-labelledby="answer">
+<div class="wrap closing closing--solo">
+${starMark()}
+<h2 class="display h2 h2--big" id="answer">Answer the call</h2>
+<p class="lead">There is no form to fill in and no address to write to. When there is a place for you, or a need we can meet together, we reach out.</p>
 </div>
 </section>
 `,
