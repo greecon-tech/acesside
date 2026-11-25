@@ -166,13 +166,15 @@ export const taglines = {
 // A line of the founders', set as a quote on the home page. No attribution: it is the alliance's own.
 export const quote = 'A team of people, standing together in service of humanity.';
 
-// Initiatives. Only one is stated so far, and it is stated in the coded public wording: "Presence" is
-// described as a principle, never as anything else. Do not invent further initiatives: add each one only when
-// the founders provide it. (Voice: show, don't boast; no claim about work done, partners or results.)
+// Initiatives. Only one is stated so far. Its public name, "Presence OS", is the founders' decision (25 Nov 2026).
+// Anything beyond that name stays in plain, general words: do not describe what it is or does, and do not
+// invent further initiatives. Add each one only when the founders provide it. The build refuses to publish
+// the founders' private name for it (tools/guard.mjs). (Voice: show, don't boast; no claim about work done,
+// partners or results.)
 export const mainInitiative = {
   label: 'Our main initiative',
-  name: 'Building Presence',
-  text: 'Presence is the ground everything else stands on. We are building it step by step: first in ourselves, then wherever we are called.',
+  name: 'Presence OS',
+  text: 'Presence OS is the ground everything else stands on. We are building it step by step: first in ourselves, then wherever we are called.',
   status: 'In progress',
 };
 export const initiativesNote = 'Other initiatives will follow. We announce them when they are ready, not before.';

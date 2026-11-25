@@ -62,7 +62,9 @@ Each is one line in `src/content.mjs`:
 
 **Purpose, in public words:** "Building Presence is why Ace's Side exists." It opens the Presence section on the home page, whose label is now "Why we exist". Stated this way it is the founders' purpose in the coded form they use publicly.
 
-**Initiatives.** A section called "Our initiatives" sits inside the "Why we exist" band on the home page, and the menu links to it (`/#initiatives`). It states **one** initiative, "Building Presence" (our main initiative, status: In progress), in the coded public wording, and says other initiatives "will follow. We announce them when they are ready, not before." No other initiative is invented: **send me the others and I will add each one** (they live in `src/content.mjs`). The word "initiative" is used freely on the site now. The Brand Book's INITIATIVE descriptor under the name (ACE'S SIDE / INITIATIVE) is still not in the logo lockup; say the word and I will add it.
+**Initiatives.** A section called "Our initiatives" sits inside the "Why we exist" band on the home page, and the menu links to it (`/#initiatives`). It states **one** initiative, **"Presence OS"** (our main initiative, status: In progress), and says other initiatives "will follow. We announce them when they are ready, not before." The founders chose the name "Presence OS" for public use. The text says nothing about what it is or does beyond "the ground everything else stands on", and no other initiative is invented: **send me the others and I will add each one** (they live in `src/content.mjs`). The word "initiative" is used freely on the site. The Brand Book's INITIATIVE descriptor under the name (ACE'S SIDE / INITIATIVE) is still not in the logo lockup; say the word and I will add it.
+
+**What "Presence OS" tells the public.** Until now the site called Presence only a principle. The name "Presence OS" tells readers it is also something being built, in the sense of a base layer. That is the founders' choice. The private name stays out of the site, the code, the documents and the commit messages (next section).
 
 The rest of the new copy:
 
@@ -80,7 +82,7 @@ The Brand Book says Ace's Side takes three things from its source of inspiration
 
 The founders keep at least one term private and share it only in coded form. It is **not written anywhere in this repository**: not in the site, the content files, the documents, the code or the commit messages.
 
-- `tools/guard.mjs` holds salted hashes of the protected terms, not the terms. Text is split into words and every run of one to three words is hashed.
+- `tools/guard.mjs` holds salted hashes of the protected terms, not the terms. Text is split into words and every run of one to three words is hashed. The public name "Presence OS" is allowed; the private name and its spellings (hyphenated, joined, possessive, oddly spaced, or spelled out in full) are blocked.
 - **`build.mjs` refuses to build** if any page contains one (so Netlify never deploys it), and leaves no half-built `public/` behind. The error names the page, never the term.
 - `tools/verify.mjs` also scans the served files, the content files, the documents and `README.md`.
 - **To protect another term** without writing it down: `node tools/hash-term.mjs "the term"`, then paste the printed hash into `SECRET_HASHES` in `tools/guard.mjs`.

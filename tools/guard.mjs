@@ -20,11 +20,11 @@ export const hashTerm = (words) => createHash('sha256').update('acesside-guard:'
 
 export const SECRET_HASHES = new Set([
   // Hashes only; see the header. The founders know what each one stands for.
+  'e81e4c254474aa174bd7160cc3905e63537b0f751c7fc39ff74d0c590b2c4aa7',
   'b5abacc8652a8d9f6fd73fa5a5b0abf4804dd49587234ff50290727f9b32aec1',
   '3c57db28c5f9da518cca72f963167afaa9e2e28895b9d8826ec1fc4a8ddc6992',
   '7529056872da35c8e4e43db8318f92d885eb0f6de11fb44116e3fee016bc6a62',
   '72fe2b8217eea8c41dc3bd008e76c4f6582a538573b0b29848c12e928b1bf219',
-  '0ced2f2e67a130facdb41f4e92b3780a55a6e5856f83e684c3bf6ef229eb37be',
 ]);
 
 // True if the text contains any protected term. Never returns or logs the match.
